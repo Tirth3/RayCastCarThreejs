@@ -14,13 +14,14 @@ const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerH
 camera.position.set(6, 6, 8);
 camera.fov = 75;
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const canvas = document.querySelector(".webgl");
+const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+// renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-document.body.style.margin = '0';
-document.body.appendChild(renderer.domElement);
+// document.body.style.margin = '0';
+// document.body.appendChild(renderer.domElement);
 
 // Orbit controls
 //const controls = new OrbitControls(camera, renderer.domElement);
@@ -142,8 +143,8 @@ const carForward = new THREE.Vector3();
 
 export function updateCinematicFollowCamera(camera, carBody, deltaTime) {
   // --- Adjustable parameters ---
-  const followSmoothness = 3.0;   // how tightly camera follows position
-  const lookSmoothness = 2.0;     // how smoothly camera rotates
+  const followSmoothness = 10.0;   // how tightly camera follows position
+  const lookSmoothness = 5.0;     // how smoothly camera rotates
   const lookDistance = 5.0;       // how far ahead of the car to look
   const offset = new THREE.Vector3(10, 10, -10); // world-space offset (corner view)
 
@@ -208,6 +209,15 @@ window.addEventListener('keyup', (e) => {
   if (e.code === 'Space') keys.brake = false;
 });
 
+document.getElementById('accelerate').addEventListener('touchstart', () => keys.forward = true);
+document.getElementById('accelerate').addEventListener('touchend', () => keys.forward = false);
+
+document.getElementById('reverse').addEventListener('touchstart', () => keys.backward = true);
+document.getElementById('reverse').addEventListener('touchend', () => keys.backward = false);
+
+document.getElementById('brake').addEventListener('touchstart', () => keys.brake = true);
+document.getElementById('brake').addEventListener('touchend', () => keys.brake = false);
+
 // static boxes for checking
 function addRandomBlocks(scene, world, count = 50) {
   const blocks = [];
@@ -253,7 +263,9 @@ function addRandomBlocks(scene, world, count = 50) {
 }
 
 const blocks = addRandomBlocks(scene, world);
-
+const maxEngineForce = 300;
+const maxBrakingForce = 15;
+const maxSteerVal = 0.3;
 
 // Animation loop
 const timeStep = 1 / 30;
@@ -270,9 +282,7 @@ function animate() {
 
   // apply forces or any physics operation
   // Apply car control forces
-  const maxEngineForce = 300;
-  const maxBrakingForce = 15;
-  const maxSteerVal = 0.3;
+
   const force = keys.forward ? -maxEngineForce : keys.backward ? maxEngineForce : 0;
   const steer = keys.left ? maxSteerVal : keys.right ? -maxSteerVal : 0;
   const brake = keys.brake ? maxBrakingForce : 0;

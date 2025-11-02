@@ -81,10 +81,10 @@ export default class Car {
       dampingRelaxation: 2.3, // Wheel's damping settings
       dampingCompression: 4.4, // Also affects elasticity
       maxSuspensionForce: 1500, // Maximum suspension force the wheel can handle
-      rollInfluence: 0.03, // Influence of the wheel's rolling during steering
+      rollInfluence: 0.08, // Influence of the wheel's rolling during steering
       axleLocal: new CANNON.Vec3(-1, 0, 0), // Set the axis of rotation for the wheel
       chassisConnectionPointLocal: new CANNON.Vec3(1, 0, -1),
-      maxSuspensionTravel: 0.9,
+      maxSuspensionTravel: 10,
       customSlidingRotationalSpeed: -30, // Speed of wheel sliding
       useCustomSlidingRotationalSpeed: true // Whether to use custom sliding rotational speed
 

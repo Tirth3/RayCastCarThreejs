@@ -1,12 +1,26 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>raycastcar</title>
-  </head>
-  <body>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>raycastcar</title>
+</head>
+
+<body>
+  <canvas class="webgl"></canvas>
+  <div id="mobile-ui">
+    <div id="joystick-container">
+      <div id="joystick"></div>
+    </div>
+    <div id="buttons">
+      <button id="accelerate" >▲</button>
+      <button id="brake">■</button>
+      <button id="reverse">▼</button>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>

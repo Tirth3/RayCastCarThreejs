@@ -2,3 +2,23 @@
   margin: 0;
   padding: 0;
 }
+
+.webgl{
+  position: absolute;
+  top : 0;
+  left : 0;
+  z-index: 1;
+}
+#mobile-ui{
+  position: absolute;
+  top: 75%;
+  left: 10%;
+  z-index: 2;
+}
+
+#buttons{
+  height: 20vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
