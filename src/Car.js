@@ -187,6 +187,7 @@ export default class Car {
 
     // Apply the new quaternion to the chassis body
     chassisBody.quaternion.copy(newQuaternion);
+    chassisBody.position.set(this.ChassisBody.position.x , 10 , this.chassisBody.position.z);
   }
 
 }

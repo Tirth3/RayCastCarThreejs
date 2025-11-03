@@ -6,6 +6,7 @@ import * as CANNON from 'cannon-es';
 
 import Car from './Car';
 import CharacterBox from './CharacterBox';
+import StaticObj from './StaticObj';
 
 // --- THREE.js setup ---
 const scene = new THREE.Scene();
@@ -114,6 +115,14 @@ const textgeo = new CharacterBox({
   depth: 0.9,
   mass: 0,
   position: new THREE.Vector3(-10, 0, 5),
+});
+
+const signpost = new StaticObj({
+  scene : scene,
+  world: world,
+  position : new THREE.Vector3(0 , 2 , 10),
+  scale : new THREE.Vector3(3 , 3 , 3),
+  objpath: '/models/signpost.obj',
 })
 
 function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new THREE.Vector3(1, 1, 1)) {
@@ -151,7 +160,7 @@ export function updateCinematicFollowCamera(camera, carBody, deltaTime) {
   const followSmoothness = 10.0;   // how tightly camera follows position
   const lookSmoothness = 5.0;     // how smoothly camera rotates
   const lookDistance = 5.0;       // how far ahead of the car to look
-  const offset = new THREE.Vector3(10, 10, -10); // world-space offset (corner view)
+  const offset = new THREE.Vector3(20, 20, -10); // world-space offset (corner view)
 
   // --- Compute desired camera position ---
   const desiredPos = new THREE.Vector3().copy(carBody.position).add(offset);
@@ -238,6 +247,9 @@ if (!isMobile) {
   document.getElementById('right').disabled = true;
   document.getElementById('right').style.visibility = 'hidden';
 
+  document.getElementById('reset').disabled = true;
+  document.getElementById('reset').style.visibility = 'hidden';
+
 }
 
 document.getElementById('accelerate').addEventListener('touchstart', () => keys.forward = true);
@@ -254,6 +266,9 @@ document.getElementById('left').addEventListener('touchend', () => keys.left = f
 
 document.getElementById('right').addEventListener('touchstart', () => keys.right = true);
 document.getElementById('right').addEventListener('touchend', () => keys.right = false);
+
+document.getElementById('reset').addEventListener('touchstart', () => car.resetCar());
+// document.getElementById('right').addEventListener('touchend', () => keys.right = false);
 
 // static boxes for checking
 function addRandomBlocks(scene, world, count = 50) {
