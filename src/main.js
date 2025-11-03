@@ -317,8 +317,8 @@ function addRandomBlocks(scene, world, count = 50) {
 }
 
 const blocks = addRandomBlocks(scene, world);
-const maxEngineForce = 300;
-const maxBrakingForce = 15;
+const maxEngineForce = 305;
+const maxBrakingForce = 10;
 const maxSteerVal = 0.3;
 
 // Animation loop
@@ -339,8 +339,7 @@ function animate() {
 
   const force = keys.forward ? -maxEngineForce : keys.backward ? maxEngineForce : 0;
   const steer = keys.left ? maxSteerVal : keys.right ? -maxSteerVal : 0;
-  const brake = keys.brake ? maxBrakingForce : 0;
-
+  const brake = (keys.brake && (force == 0)) ? maxBrakingForce : 2;
 
   // Apply engine force
   car.vehicle.applyEngineForce(force, 0);

@@ -76,11 +76,11 @@ export default class Car {
     const wheelOptions = {
       radius: 0.6, // Wheel radius
       directionLocal: new CANNON.Vec3(0, -1, 0), // Wheel's local direction vector
-      suspensionStiffness: 30, // Affects the elasticity response of the wheel to the ground.
-      suspensionRestLength: 0.1, // Initial length of the wheel suspension
-      frictionSlip: 5.4, // Friction force of the wheel
-      dampingRelaxation: 2.3, // Wheel's damping settings
-      dampingCompression: 4.4, // Also affects elasticity
+      suspensionStiffness: 35, // Affects the elasticity response of the wheel to the ground.
+      suspensionRestLength: 0.3, // Initial length of the wheel suspension
+      frictionSlip: 10, // Friction force of the wheel
+      dampingRelaxation: 3.3, // Wheel's damping settings
+      dampingCompression: 6.4, // Also affects elasticity
       maxSuspensionForce: 1500, // Maximum suspension force the wheel can handle
       rollInfluence: 0.08, // Influence of the wheel's rolling during steering
       axleLocal: new CANNON.Vec3(-1, 0, 0), // Set the axis of rotation for the wheel
@@ -187,7 +187,7 @@ export default class Car {
 
     // Apply the new quaternion to the chassis body
     chassisBody.quaternion.copy(newQuaternion);
-    chassisBody.position.set(this.ChassisBody.position.x , 10 , this.chassisBody.position.z);
+    chassisBody.position.set(this.ChassisBody.position.x, 10, this.chassisBody.position.z);
   }
 
 }
