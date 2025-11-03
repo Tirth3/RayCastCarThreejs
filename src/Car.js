@@ -10,10 +10,10 @@ export default class Car {
     this.scene = scene;
     this.world = world;
     this.mass = mass;
-
+    this.isready = false;
     // --- chassis (CANNON) ---
     // Use half-extents for CANNON.Box (1,1,2) -> visual size will be doubled
-    const halfExtents = new CANNON.Vec3(1.2, 1, 1.6);
+    const halfExtents = new CANNON.Vec3(1.2, 1, 2.5);
     const chassisShape = new CANNON.Box(halfExtents);
 
     const chassisBody = new CANNON.Body({ mass: this.mass });
@@ -42,7 +42,7 @@ export default class Car {
           }
         });
         // Optionally scale the model
-        object.scale.set(1.3, 0.75, 1);
+        object.scale.set(1.3, 0.75, 1.2);
 
         // Center the model
         object.position.set(0, 2, 0);
@@ -52,6 +52,7 @@ export default class Car {
 
         // Save reference for updates
         this.ChassisMesh = object;
+        this.isready = true;
       },
       (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
@@ -75,7 +76,7 @@ export default class Car {
     const wheelOptions = {
       radius: 0.6, // Wheel radius
       directionLocal: new CANNON.Vec3(0, -1, 0), // Wheel's local direction vector
-      suspensionStiffness: 20, // Affects the elasticity response of the wheel to the ground.
+      suspensionStiffness: 30, // Affects the elasticity response of the wheel to the ground.
       suspensionRestLength: 0.1, // Initial length of the wheel suspension
       frictionSlip: 5.4, // Friction force of the wheel
       dampingRelaxation: 2.3, // Wheel's damping settings
@@ -92,7 +93,7 @@ export default class Car {
 
     // Add four wheels (front-left, front-right, back-left, back-right)
     const halfWidth = halfExtents.x * 1.1; // x offset
-    const halfLength = halfExtents.z * 0.8; // z offset
+    const halfLength = halfExtents.z * 0.5; // z offset
 
     // front-left
     wheelOptions.chassisConnectionPointLocal = new CANNON.Vec3(halfWidth, -1, halfLength);
@@ -140,6 +141,7 @@ export default class Car {
 
   // Call every frame: sync three meshes with cannon bodies
   Update() {
+    if (!this.isready) return;
     // sync chassis
     this.ChassisMesh.position.copy(this.ChassisBody.position);
     this.ChassisMesh.quaternion.copy(this.ChassisBody.quaternion);
@@ -156,22 +158,35 @@ export default class Car {
       }
     }
   }
+  limitSpeedSmooth(maxSpeed = 50, damping = 0.9) {
+    const vel = this.ChassisBody.velocity;
+    const speed = vel.length();
+
+    if (speed > maxSpeed) {
+      vel.scale(damping, vel); // gradually slow it down
+    }
+  }
   resetCar() {
-    // Reset position
-    car.ChassisBody.position.set(0, 5, 0);
+    // Assume `vehicle` is your CANNON.RaycastVehicle object
+    const chassisBody = this.vehicle.chassisBody;
+    console.log("reset");
+    // Reset the angular velocity first
+    chassisBody.angularVelocity.set(0, 0, 0);
 
-    // Reset rotation (upright)
-    car.ChassisBody.quaternion.set(0, 0, 0, 1);
+    // Create a new quaternion
+    const newQuaternion = new CANNON.Quaternion();
 
-    // Stop motion
-    car.ChassisBody.velocity.set(0, 0, 0);
-    car.ChassisBody.angularVelocity.set(0, 0, 0);
+    // Define the rotation axis (the "up" vector, typically Y)
+    const upAxis = new CANNON.Vec3(0, 1, 0);
 
-    // Also reset vehicle wheels’ transforms (important!)
-    car.Vehicle.updateWheelTransform(0);
-    car.Vehicle.updateWheelTransform(1);
-    car.Vehicle.updateWheelTransform(2);
-    car.Vehicle.updateWheelTransform(3);
+    // Define the angle in radians (e.g., Math.PI for a 180-degree turn)
+    const rotationAngle = Math.PI / 2; // 90 degrees
+
+    // Set the quaternion from the axis and angle
+    newQuaternion.setFromAxisAngle(upAxis, rotationAngle);
+
+    // Apply the new quaternion to the chassis body
+    chassisBody.quaternion.copy(newQuaternion);
   }
 
 }

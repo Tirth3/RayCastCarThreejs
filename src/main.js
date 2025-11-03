@@ -1,3 +1,4 @@
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import './style.css'
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -8,11 +9,11 @@ import CharacterBox from './CharacterBox';
 
 // --- THREE.js setup ---
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x202530);
+scene.background = new THREE.Color(0xaaaaaa);
 
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
 camera.position.set(6, 6, 8);
-camera.fov = 75;
+camera.fov = 45;
 
 const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
@@ -36,12 +37,15 @@ scene.add(hemi);
 const dir = new THREE.DirectionalLight(0xffffff, 2);
 dir.position.set(5, 10, 7);
 dir.castShadow = true;
-dir.shadow.camera.left = -10;
-dir.shadow.camera.right = 10;
-dir.shadow.camera.top = 10;
-dir.shadow.camera.bottom = -10;
+dir.shadow.camera.left = -200;
+dir.shadow.camera.right = 200;
+dir.shadow.camera.top = 200;
+dir.shadow.camera.bottom = -200;
 dir.shadow.camera.near = 0.5;
-dir.shadow.camera.far = 50;
+dir.shadow.camera.far = 1000;
+dir.shadow.mapSize.set(4096, 4096); // higher = sharper shadows
+dir.shadow.bias = -0.0001;
+dir.shadow.normalBias = 0.02;
 scene.add(dir);
 
 // --- Cannon-es physics world ---
@@ -55,7 +59,7 @@ groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
 world.addBody(groundBody);
 
 // THREE ground mesh
-const groundGeo = new THREE.PlaneGeometry(200, 200);
+const groundGeo = new THREE.PlaneGeometry(2000, 2000);
 const groundMat = new THREE.MeshStandardMaterial({ color: 0xfaa533, metalness: 0.1, roughness: 0.9 });
 const groundMesh = new THREE.Mesh(groundGeo, groundMat);
 groundMesh.receiveShadow = true;
@@ -107,8 +111,9 @@ const textgeo = new CharacterBox({
   scale: new THREE.Vector3(-1, 1, 1),
   Size: 2,
   height: 2,
-  depth: 1.5,
-  position: new THREE.Vector3(-9, 2, 5),
+  depth: 0.9,
+  mass: 0,
+  position: new THREE.Vector3(-10, 0, 5),
 })
 
 function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new THREE.Vector3(1, 1, 1)) {
@@ -208,6 +213,32 @@ window.addEventListener('keyup', (e) => {
   if (e.code === 'KeyD') keys.right = false;
   if (e.code === 'Space') keys.brake = false;
 });
+window.oncontextmenu = function (event) {
+  event.preventDefault();
+  event.stopPropagation();
+  return false;
+};
+
+const userAgent = navigator.userAgent.toLowerCase();
+const isMobile = (userAgent.indexOf("android") > -1) || (userAgent.indexOf("iphone") > -1)
+console.log(isMobile);
+if (!isMobile) {
+  document.getElementById('accelerate').disabled = true;
+  document.getElementById('accelerate').style.visibility = 'hidden';
+
+  document.getElementById('reverse').disabled = true;
+  document.getElementById('reverse').style.visibility = 'hidden';
+
+  document.getElementById('brake').disabled = true;
+  document.getElementById('brake').style.visibility = 'hidden';
+
+  document.getElementById('left').disabled = true;
+  document.getElementById('left').style.visibility = 'hidden';
+
+  document.getElementById('right').disabled = true;
+  document.getElementById('right').style.visibility = 'hidden';
+
+}
 
 document.getElementById('accelerate').addEventListener('touchstart', () => keys.forward = true);
 document.getElementById('accelerate').addEventListener('touchend', () => keys.forward = false);
@@ -218,12 +249,20 @@ document.getElementById('reverse').addEventListener('touchend', () => keys.backw
 document.getElementById('brake').addEventListener('touchstart', () => keys.brake = true);
 document.getElementById('brake').addEventListener('touchend', () => keys.brake = false);
 
+document.getElementById('left').addEventListener('touchstart', () => keys.left = true);
+document.getElementById('left').addEventListener('touchend', () => keys.left = false);
+
+document.getElementById('right').addEventListener('touchstart', () => keys.right = true);
+document.getElementById('right').addEventListener('touchend', () => keys.right = false);
+
 // static boxes for checking
 function addRandomBlocks(scene, world, count = 50) {
   const blocks = [];
 
   const boxGeo = new THREE.BoxGeometry(1, 1, 1);
 
+  let j = 1;
+  // for (let j = 0 ; j < 10 ; j++)
   for (let i = 0; i < count; i++) {
     const boxMat = new THREE.MeshStandardMaterial({ color: (Math.random() - 0.5) * 127, metalness: 0.2, roughness: 0.8 });
     // Random position on ground
@@ -231,12 +270,12 @@ function addRandomBlocks(scene, world, count = 50) {
     const z = (Math.random() - 0.5) * 20;
     const y = -0.3; // half height, sitting on ground
     */
-    let x = 1;
+    let x = 2 * j;
     const y = -0.3;
     let z = i * 2;
 
     if (i > count / 2) {
-      x = -1;
+      x = -2 * j;
       z = (count - i) * 2 + 0.5;
     }
 
@@ -307,6 +346,7 @@ function animate() {
   // Sync mesh and physics body
   sphereMesh.position.copy(sphereBody.position);
   sphereMesh.quaternion.copy(sphereBody.quaternion);
+  car.limitSpeedSmooth(15 , 0.9);
   car.Update();
   textgeo.update();
 

@@ -16,6 +16,7 @@ export default class CharacterBox {
     color = 0xffffff,
     text = 'Hello',
     font,
+    mass = 1,
   }) {
     this.scene = scene;
     this.world = world;
@@ -23,7 +24,7 @@ export default class CharacterBox {
     this.color = color;
     this.fonturl = font;
     this.text = text;
-
+    this.mass = mass;
     this.mesh = null;
     this.body = null;
     this.isReady = false;
@@ -77,7 +78,7 @@ export default class CharacterBox {
 
       const halfExtents = new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2);
       const shape = new CANNON.Box(halfExtents);
-      const body = new CANNON.Body({ mass: 1 });
+      const body = new CANNON.Body({ mass: this.mass });
       body.addShape(shape);
       body.position.set(this.position.x, this.position.y, this.position.z);
 

@@ -3,8 +3,8 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <title>raycastcar</title>
 </head>
 
@@ -14,13 +14,18 @@
     <div id="joystick-container">
       <div id="joystick"></div>
     </div>
-    <div id="buttons">
-      <button id="accelerate" >▲</button>
-      <button id="brake">■</button>
-      <button id="reverse">▼</button>
+    <div id="buttons1">
+      <button type="button" id="accelerate" class="btn btn-outline-light"> <i class="fa-solid fa-angle-up"></i> </button>
+      <button type="button" id="brake" class="btn btn-outline-light"> <i class="fa-solid fa-stop"></i> </button>
+      <button type="button" id="reverse" class="btn btn-outline-light"><i class="fa-solid fa-angle-down"></i></button>
+    </div>
+    <div id="buttons2">
+      <button type="button" id="left" class="btn btn-outline-light"> <i class="fa-solid fa-chevron-left"></i> </button>
+      <button type="button" id="right" class="btn btn-outline-light"> <i class="fa-solid fa-chevron-right"></i> </button>
     </div>
   </div>
   <script type="module" src="/src/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 
 </html>
