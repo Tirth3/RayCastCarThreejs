@@ -28,9 +28,9 @@ manager.onProgress = function (url, itemsLoaded, itemsTotal) {
 
 // Called when everything is loaded
 manager.onLoad = function () {
-  loadingText.innerHTML = `<button type="button" id="start-btn" class="btn-outline-light">
-  <i class="fa-solid fa-play"></i>
-  </button>`;
+  loadingText.innerHTML = `
+  <h1 id="start-btn">START</h1>
+  `;
   const startBtn = document.getElementById('start-btn');
   startBtn.onclick = () => {
     loadingScreen.classList.add('hidden');
@@ -197,13 +197,13 @@ const trigger = new TriggerSphere({
   color: 0xffaa00,
 });
 
-const ambient = new AmbientParticles(scene, {
-  count: 50000,
-  area: 200,
-  color: 0x99ccff,
-  size: 0.1,
-  speed: 0.1,
-});
+// const ambient = new AmbientParticles(scene, {
+//   count: 50000,
+//   area: 200,
+//   color: 0x99ccff,
+//   size: 0.1,
+//   speed: 0.1,
+// });
 
 // --- Follow Camera Helper ---
 // Persistent vectors for smooth transitions
@@ -433,7 +433,7 @@ function animate() {
   textgeo.forEach((item) => {
     item.update();
   });
-  ambient.update(dt);
+  // ambient.update(dt);
 
   updateCinematicFollowCamera(camera, car.ChassisBody, dt);
   if (keys.debug)
