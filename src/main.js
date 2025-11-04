@@ -3,10 +3,13 @@ import './style.css'
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as CANNON from 'cannon-es';
+import CannonDebugger from 'cannon-es-debugger';
+
 
 import Car from './Car';
 import CharacterBox from './CharacterBox';
 import StaticObj from './StaticObj';
+import TriggerSphere from './TriggerSphere';
 
 // --- THREE.js setup ---
 const scene = new THREE.Scene();
@@ -15,6 +18,44 @@ scene.background = new THREE.Color(0xaaaaaa);
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
 camera.position.set(6, 6, 8);
 camera.fov = 45;
+
+
+// Fix: resume the AudioContext after first user gesture
+function unlockAudioContext() {
+    const ctx = THREE.AudioContext.getContext();
+
+  if (ctx.state === 'running') {
+    console.log('🎵 AudioContext already running');
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    const unlock = async () => {
+      try {
+        await ctx.resume();
+        if (ctx.state === 'running') {
+          console.log('✅ AudioContext resumed');
+          document.removeEventListener('pointerdown', unlock);
+          document.removeEventListener('touchstart', unlock);
+          document.removeEventListener('keydown', unlock);
+          resolve();
+        }
+      } catch (err) {
+        console.warn('⚠️ Failed to resume AudioContext:', err);
+      }
+    };
+
+    // works on desktop and mobile
+    document.addEventListener('pointerdown', unlock, { once: true });
+    document.addEventListener('touchstart', unlock, { once: true });
+    document.addEventListener('keydown', unlock, { once: true });
+  });
+}
+unlockAudioContext();
+
+
+const listner = new THREE.AudioListener();
+camera.add(listner);
 
 const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
@@ -68,28 +109,29 @@ groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
 
 // Grid helper
-const grid = new THREE.GridHelper(20, 20, 0x222222, 0x222222);
-grid.material.opacity = 0.25;
-grid.material.transparent = true;
+//const grid = new THREE.GridHelper(20, 20, 0x222222, 0x222222);
+//grid.material.opacity = 0.25;
+//grid.material.transparent = true;
 //scene.add(grid);
-const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
+//const axesHelper = new THREE.AxesHelper(5);
+//scene.add(axesHelper);
+const cannonDebugger = new CannonDebugger(scene, world);
 
 
 // Sphere (CANNON + THREE)
-const radius = 2;
-const sphereShape = new CANNON.Sphere(radius);
-const sphereBody = new CANNON.Body({ mass: 1 });
-sphereBody.addShape(sphereShape);
-sphereBody.position.set(8, 10, 5);
-sphereBody.angularDamping = 0.1;
-world.addBody(sphereBody);
+// const radius = 2;
+// const sphereShape = new CANNON.Sphere(radius);
+// const sphereBody = new CANNON.Body({ mass: 1 });
+// sphereBody.addShape(sphereShape);
+// sphereBody.position.set(8, 10, 5);
+// sphereBody.angularDamping = 0.1;
+// world.addBody(sphereBody);
 
-const sphereGeo = new THREE.SphereGeometry(radius, 32, 24);
-const sphereMat = new THREE.MeshStandardMaterial({ color: 0x2194ce, metalness: 0.2, roughness: 0.3 });
-const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
-sphereMesh.castShadow = true;
-scene.add(sphereMesh);
+// const sphereGeo = new THREE.SphereGeometry(radius, 32, 24);
+// const sphereMat = new THREE.MeshStandardMaterial({ color: 0x2194ce, metalness: 0.2, roughness: 0.3 });
+// const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+// sphereMesh.castShadow = true;
+// scene.add(sphereMesh);
 
 // Contact materials (optional)
 const groundMatPhys = new CANNON.Material('groundMat');
@@ -100,10 +142,11 @@ const contactMat = new CANNON.ContactMaterial(groundMatPhys, sphereMatPhys, {
 });
 world.addContactMaterial(contactMat);
 groundBody.material = groundMatPhys;
-sphereBody.material = sphereMatPhys;
+// sphereBody.material = sphereMatPhys;
 
-const car = new Car({ scene: scene, world: world });
-const textgeo = new CharacterBox({
+const car = new Car({ scene: scene, world: world , listner: listner });
+let textgeo = [];
+textgeo.push(new CharacterBox({
   scene: scene,
   world: world,
   font: '/Deluna_Regular.json',
@@ -114,16 +157,30 @@ const textgeo = new CharacterBox({
   height: 2,
   depth: 0.9,
   mass: 0,
-  position: new THREE.Vector3(-10, 0, 5),
-});
-
-const signpost = new StaticObj({
-  scene : scene,
+  position: new THREE.Vector3(0, 0, 6),
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
   world: world,
-  position : new THREE.Vector3(0 , 2 , 10),
-  scale : new THREE.Vector3(3 , 3 , 3),
-  objpath: '/models/signpost.obj',
-})
+  font: '/Deluna_Regular.json',
+  text: 'Drive Around, see what you can find.',
+  rotation: new THREE.Vector3(Math.PI / 2, 0, 0),
+  scale: new THREE.Vector3(-1 , 1 , 1),
+  Size: 1.5,
+  height: 1.5,
+  depth: 0.5,
+  mass: 0,
+  position: new THREE.Vector3(0, 0, 10),
+}));
+
+// const signpost = new StaticObj({
+//   scene : scene,
+//   world: world,
+//   position : new THREE.Vector3(0 , 2 , 10),
+//   scale : new THREE.Vector3(3 , 3 , 3),
+//   objpath: '/models/signpost.obj',
+//   mtlpath: '/models/signpost.mtl',
+// });
 
 function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new THREE.Vector3(1, 1, 1)) {
   let chars = [];
@@ -141,24 +198,37 @@ function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new T
       height: 2,
       depth: 1,
     }));
+    // textgeo.push(chars[i-1]);
   }
   return chars;
 }
 
-const name1 = create3DText("TATYAAA", new THREE.Vector3(-5, 0, 15), new THREE.Vector3(-1, 1, 1));
-const name2 = create3DText("POOKIE", new THREE.Vector3(-5, 5, 15), new THREE.Vector3(-1, 1, 1));
+const name1 = create3DText("TATYAAA", new THREE.Vector3(0, 5, 30), new THREE.Vector3(-1, 1, 1));
+const name2 = create3DText("POOKIE", new THREE.Vector3(0, 10, 30), new THREE.Vector3(-1, 1, 1));
+textgeo = textgeo.concat(name1);
+textgeo = textgeo.concat(name2);
+
+const trigger = new TriggerSphere({
+  scene,
+  camera,
+  world,
+  position: new THREE.Vector3(10, 2, 5),
+  radius: 1,
+  triggerRadius: 10,
+  color: 0xffaa00,
+});
 
 // --- Follow Camera Helper ---
 // Persistent vectors for smooth transitions
 const camTarget = new THREE.Vector3();
 const camPosition = new THREE.Vector3();
 const carVelocity = new THREE.Vector3();
-const carForward = new THREE.Vector3();
+// const carForward = new THREE.Vector3();
 
 export function updateCinematicFollowCamera(camera, carBody, deltaTime) {
   // --- Adjustable parameters ---
-  const followSmoothness = 10.0;   // how tightly camera follows position
-  const lookSmoothness = 5.0;     // how smoothly camera rotates
+  const followSmoothness = 5.0;   // how tightly camera follows position
+  const lookSmoothness = 2.0;     // how smoothly camera rotates
   const lookDistance = 5.0;       // how far ahead of the car to look
   const offset = new THREE.Vector3(20, 20, -10); // world-space offset (corner view)
 
@@ -203,6 +273,7 @@ const keys = {
   left: false,
   right: false,
   brake: false,
+  debug: false,
 };
 
 // Keyboard input
@@ -211,6 +282,7 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'KeyS') keys.backward = true;
   if (e.code === 'KeyA') keys.left = true;
   if (e.code === 'KeyD') keys.right = true;
+  if (e.code === 'KeyP') keys.debug = true;
   if (e.code === "Space") keys.brake = true;
   if (e.key.toLocaleLowerCase() === 'r') car.resetCar();
 });
@@ -220,6 +292,7 @@ window.addEventListener('keyup', (e) => {
   if (e.code === 'KeyS') keys.backward = false;
   if (e.code === 'KeyA') keys.left = false;
   if (e.code === 'KeyD') keys.right = false;
+  if (e.code === 'KeyP') keys.debug = false;
   if (e.code === 'Space') keys.brake = false;
 });
 window.oncontextmenu = function (event) {
@@ -316,7 +389,7 @@ function addRandomBlocks(scene, world, count = 50) {
   return blocks;
 }
 
-const blocks = addRandomBlocks(scene, world);
+//const blocks = addRandomBlocks(scene, world);
 const maxEngineForce = 305;
 const maxBrakingForce = 10;
 const maxSteerVal = 0.3;
@@ -333,6 +406,11 @@ function animate() {
   if (dt < timeStep) return;
   lastTime = now;
   world.step(timeStep, dt, 1);
+
+  trigger.update(car.ChassisBody);
+
+  if(trigger.consumeClick())
+    alert("HELLO");
 
   // apply forces or any physics operation
   // Apply car control forces
@@ -357,22 +435,19 @@ function animate() {
   car.vehicle.setBrake(brake, 2);
   car.vehicle.setBrake(brake, 3);
 
-  // Sync mesh and physics body
-  sphereMesh.position.copy(sphereBody.position);
-  sphereMesh.quaternion.copy(sphereBody.quaternion);
-  car.limitSpeedSmooth(15 , 0.9);
+  // // Sync mesh and physics body
+  // sphereMesh.position.copy(sphereBody.position);
+  // sphereMesh.quaternion.copy(sphereBody.quaternion);
+  car.limitSpeedSmooth(30, 0.9);
   car.Update();
-  textgeo.update();
-
-  name1.forEach((item) => {
+  // textgeo.update();
+  textgeo.forEach((item) => {
     item.update();
-  });
+  })
 
-  name2.forEach((item) => {
-    item.update();
-  });
   updateCinematicFollowCamera(camera, car.ChassisBody, dt);
-
+  if (keys.debug)
+    cannonDebugger.update(scene, camera);
   renderer.render(scene, camera);
 }
 

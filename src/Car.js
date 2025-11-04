@@ -3,7 +3,7 @@ import * as CANNON from 'cannon-es';
 import { OBJLoader } from 'three/examples/jsm/Addons.js';
 
 export default class Car {
-  constructor({ scene, world, mass = 150 }) {
+  constructor({ scene, world, listner, mass = 150 }) {
     if (!scene) throw new Error('Car: scene is required');
     if (!world) throw new Error('Car: world is required');
 
@@ -17,7 +17,8 @@ export default class Car {
     const chassisShape = new CANNON.Box(halfExtents);
 
     const chassisBody = new CANNON.Body({ mass: this.mass });
-    chassisBody.addShape(chassisShape);
+    const comoffset = new CANNON.Vec3(0, 0.5, 0);
+    chassisBody.addShape(chassisShape, comoffset);
     chassisBody.position.set(0, 2, 0);
     chassisBody.angularDamping = 0.6; // reduce spinning
     this.ChassisBody = chassisBody;
@@ -31,6 +32,26 @@ export default class Car {
     // chassisMesh.position.copy(chassisBody.position);
     // this.scene.add(chassisMesh);
     // this.ChassisMesh = chassisMesh;
+
+    this.listner = listner;
+    this.sound = new THREE.PositionalAudio(this.listner);
+    this.sound.autoplay = true;
+    const audioloader = new THREE.AudioLoader();
+    audioloader.load('/audio/engineidle.mp3', (buffer) => {
+      this.sound.setBuffer(buffer);
+      this.sound.setRefDistance(50);
+      this.sound.setLoop(true);
+      this.sound.setVolume(1);
+      this.sound.play();
+    },
+     (xhr) => {
+        console.log((xhr.loaded / xhr.total) * 100 + '% mp3 loaded');
+      },
+      (error) => {
+        console.error('Error loading mp3:', error);
+      }
+    );
+
     const loader = new OBJLoader();
     loader.load('/models/truck.obj',
       (object) => {
@@ -46,6 +67,7 @@ export default class Car {
 
         // Center the model
         object.position.set(0, 2, 0);
+        object.add(this.sound);
 
         // Add to scene
         this.scene.add(object);
@@ -61,6 +83,7 @@ export default class Car {
         console.error('Error loading OBJ:', error);
       }
     );
+    // this.ChassisMesh.add(this.sound);
 
     // --- RaycastVehicle ---
     this.vehicle = new CANNON.RaycastVehicle({
@@ -156,6 +179,13 @@ export default class Car {
         mesh.position.copy(t.position);
         mesh.quaternion.copy(t.quaternion);
       }
+    }
+    console.log(this.sound.isPlaying);
+    // --- Adjust pitch based on speed ---
+    if (this.sound && this.sound.isPlaying) {
+      const speed = this.ChassisBody.velocity.length();
+      const pitch = THREE.MathUtils.clamp(1 + speed * 0.08, 1, 2.0);
+      this.sound.setPlaybackRate(pitch);
     }
   }
   limitSpeedSmooth(maxSpeed = 50, damping = 0.9) {
