@@ -3,7 +3,7 @@ import * as CANNON from 'cannon-es';
 import { OBJLoader } from 'three/examples/jsm/Addons.js';
 
 export default class Car {
-  constructor({ scene, world, listner, mass = 150 }) {
+  constructor({ scene, world, listner , manager, mass = 150 }) {
     if (!scene) throw new Error('Car: scene is required');
     if (!world) throw new Error('Car: world is required');
 
@@ -34,17 +34,18 @@ export default class Car {
     // this.ChassisMesh = chassisMesh;
 
     this.listner = listner;
+    //--- Truck audio ----
     this.sound = new THREE.PositionalAudio(this.listner);
     this.sound.autoplay = true;
-    const audioloader = new THREE.AudioLoader();
+    const audioloader = new THREE.AudioLoader(manager);
     audioloader.load('/audio/engineidle.mp3', (buffer) => {
       this.sound.setBuffer(buffer);
-      this.sound.setRefDistance(50);
+      this.sound.setRefDistance(10);
       this.sound.setLoop(true);
       this.sound.setVolume(1);
       this.sound.play();
     },
-     (xhr) => {
+      (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + '% mp3 loaded');
       },
       (error) => {
@@ -52,7 +53,18 @@ export default class Car {
       }
     );
 
-    const loader = new OBJLoader();
+    // --- BRAKE SOUND ---
+    this.brakeSound = new THREE.PositionalAudio(this.listner);
+    const brakeAudioLoader = new THREE.AudioLoader(manager);
+    brakeAudioLoader.load('/audio/brake2.wav', (buffer) => {
+      this.brakeSound.setBuffer(buffer);
+      this.brakeSound.setRefDistance(10);
+      this.brakeSound.setLoop(true); // plays once per brake press
+      this.brakeSound.setVolume(0.8);
+      this.brakeSound.pitch = 1000;
+    });
+
+    const loader = new OBJLoader(manager);
     loader.load('/models/truck.obj',
       (object) => {
         object.traverse((child) => {
@@ -68,6 +80,7 @@ export default class Car {
         // Center the model
         object.position.set(0, 2, 0);
         object.add(this.sound);
+        object.add(this.brakeSound);
 
         // Add to scene
         this.scene.add(object);
@@ -165,6 +178,7 @@ export default class Car {
   // Call every frame: sync three meshes with cannon bodies
   Update() {
     if (!this.isready) return;
+    if(!this.ChassisBody.position) return;
     // sync chassis
     this.ChassisMesh.position.copy(this.ChassisBody.position);
     this.ChassisMesh.quaternion.copy(this.ChassisBody.quaternion);
@@ -180,7 +194,7 @@ export default class Car {
         mesh.quaternion.copy(t.quaternion);
       }
     }
-    console.log(this.sound.isPlaying);
+    // console.log(this.sound.isPlaying);
     // --- Adjust pitch based on speed ---
     if (this.sound && this.sound.isPlaying) {
       const speed = this.ChassisBody.velocity.length();
@@ -217,8 +231,23 @@ export default class Car {
 
     // Apply the new quaternion to the chassis body
     chassisBody.quaternion.copy(newQuaternion);
-    chassisBody.position.set(this.ChassisBody.position.x, 10, this.chassisBody.position.z);
+    chassisBody.position.set(chassisBody.position.x, 3,chassisBody.position.z);
   }
+
+  playBrakeSound(isbraking) {
+    if (!this.brakeSound || !this.isready) return;
+
+    // Avoid overlapping playback
+    if (!this.brakeSound.isPlaying) {
+      if (isbraking)
+        this.brakeSound.play();
+      // this.brakeSound.play();
+    }
+    if(!isbraking)
+      this.brakeSound.stop();
+
+  }
+
 
 }
 

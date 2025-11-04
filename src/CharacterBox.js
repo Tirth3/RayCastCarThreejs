@@ -13,6 +13,7 @@ export default class CharacterBox {
     Size = 1,
     height = 1,
     depth = 1,
+    manager,
     color = 0xffffff,
     text = 'Hello',
     font,
@@ -29,7 +30,7 @@ export default class CharacterBox {
     this.body = null;
     this.isReady = false;
 
-    const loader = new FontLoader();
+    const loader = new FontLoader(manager);
     loader.load(this.fonturl, (font) => {
       // Create text geometry
       const geo = new TextGeometry(this.text, {

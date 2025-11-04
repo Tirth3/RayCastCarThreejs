@@ -12,6 +12,7 @@ export default class StaticObj {
     rotation = new THREE.Vector3(0, 0, 0),
     objpath,
     mtlpath,
+    manager,
     boxSize = new THREE.Vector3(1, 1, 1), // Custom size for physics box
     color = 0xffffff,
   }) {
@@ -21,14 +22,14 @@ export default class StaticObj {
     this.body = null;
     this.isReady = false;
 
-    const mtlLoader = new MTLLoader();
+    const mtlLoader = new MTLLoader(manager);
 
     mtlLoader.load(
       mtlpath,
       (materials) => {
         materials.preload();
 
-        const objLoader = new OBJLoader();
+        const objLoader = new OBJLoader(manager);
         objLoader.setMaterials(materials);
 
         objLoader.load(

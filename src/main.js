@@ -10,6 +10,40 @@ import Car from './Car';
 import CharacterBox from './CharacterBox';
 import StaticObj from './StaticObj';
 import TriggerSphere from './TriggerSphere';
+import AmbientParticles from './AmbientParticles.js';
+
+// --- Loading Setup ---
+const loadingScreen = document.getElementById('loading-screen');
+const loadingText = document.getElementById('loading-text');
+
+// Create a loading manager
+const manager = new THREE.LoadingManager();
+
+// Called every time an item is loaded
+manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+  const progress = Math.round((itemsLoaded / itemsTotal) * 100);
+  loadingText.textContent = `Loading... ${progress}%`;
+};
+
+// Called when everything is loaded
+manager.onLoad = function () {
+  loadingText.innerHTML = `<button type="button" id="start-btn" class="btn-outline-light">
+  <i class="fa-solid fa-play"></i>
+  </button>`;
+  const startBtn = document.getElementById('start-btn');
+  startBtn.onclick = () => {
+    loadingScreen.classList.add('hidden');
+    // resume AudioContext (important for mobile!)
+    const ctx = THREE.AudioContext.getContext();
+    if (ctx.state === 'suspended') ctx.resume();
+  };
+};
+
+// Called on error
+manager.onError = function (url) {
+  console.error('Error loading', url);
+  loadingText.textContent = 'Error loading assets';
+};
 
 // --- THREE.js setup ---
 const scene = new THREE.Scene();
@@ -18,40 +52,6 @@ scene.background = new THREE.Color(0xaaaaaa);
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
 camera.position.set(6, 6, 8);
 camera.fov = 45;
-
-
-// Fix: resume the AudioContext after first user gesture
-function unlockAudioContext() {
-    const ctx = THREE.AudioContext.getContext();
-
-  if (ctx.state === 'running') {
-    console.log('🎵 AudioContext already running');
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve) => {
-    const unlock = async () => {
-      try {
-        await ctx.resume();
-        if (ctx.state === 'running') {
-          console.log('✅ AudioContext resumed');
-          document.removeEventListener('pointerdown', unlock);
-          document.removeEventListener('touchstart', unlock);
-          document.removeEventListener('keydown', unlock);
-          resolve();
-        }
-      } catch (err) {
-        console.warn('⚠️ Failed to resume AudioContext:', err);
-      }
-    };
-
-    // works on desktop and mobile
-    document.addEventListener('pointerdown', unlock, { once: true });
-    document.addEventListener('touchstart', unlock, { once: true });
-    document.addEventListener('keydown', unlock, { once: true });
-  });
-}
-unlockAudioContext();
 
 
 const listner = new THREE.AudioListener();
@@ -144,7 +144,7 @@ world.addContactMaterial(contactMat);
 groundBody.material = groundMatPhys;
 // sphereBody.material = sphereMatPhys;
 
-const car = new Car({ scene: scene, world: world , listner: listner });
+const car = new Car({ scene: scene, world: world, listner: listner, manager: manager });
 let textgeo = [];
 textgeo.push(new CharacterBox({
   scene: scene,
@@ -157,6 +157,7 @@ textgeo.push(new CharacterBox({
   height: 2,
   depth: 0.9,
   mass: 0,
+  manager: manager,
   position: new THREE.Vector3(0, 0, 6),
 }));
 textgeo.push(new CharacterBox({
@@ -165,11 +166,12 @@ textgeo.push(new CharacterBox({
   font: '/Deluna_Regular.json',
   text: 'Drive Around, see what you can find.',
   rotation: new THREE.Vector3(Math.PI / 2, 0, 0),
-  scale: new THREE.Vector3(-1 , 1 , 1),
+  scale: new THREE.Vector3(-1, 1, 1),
   Size: 1.5,
   height: 1.5,
   depth: 0.5,
   mass: 0,
+  manager: manager,
   position: new THREE.Vector3(0, 0, 10),
 }));
 
@@ -197,6 +199,7 @@ function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new T
       Size: 2,
       height: 2,
       depth: 1,
+      manager: manager,
     }));
     // textgeo.push(chars[i-1]);
   }
@@ -216,6 +219,13 @@ const trigger = new TriggerSphere({
   radius: 1,
   triggerRadius: 10,
   color: 0xffaa00,
+});
+
+const ambient = new AmbientParticles(scene, {
+  count: 50000,
+  area: 200,
+  color: 0x99ccff,
+  size: 0.1,
 });
 
 // --- Follow Camera Helper ---
@@ -409,7 +419,7 @@ function animate() {
 
   trigger.update(car.ChassisBody);
 
-  if(trigger.consumeClick())
+  if (trigger.consumeClick())
     alert("HELLO");
 
   // apply forces or any physics operation
@@ -418,6 +428,8 @@ function animate() {
   const force = keys.forward ? -maxEngineForce : keys.backward ? maxEngineForce : 0;
   const steer = keys.left ? maxSteerVal : keys.right ? -maxSteerVal : 0;
   const brake = (keys.brake && (force == 0)) ? maxBrakingForce : 2;
+  // if(keys.brake)
+  car.playBrakeSound(keys.brake);
 
   // Apply engine force
   car.vehicle.applyEngineForce(force, 0);
@@ -443,7 +455,8 @@ function animate() {
   // textgeo.update();
   textgeo.forEach((item) => {
     item.update();
-  })
+  });
+  ambient.update(dt);
 
   updateCinematicFollowCamera(camera, car.ChassisBody, dt);
   if (keys.debug)
