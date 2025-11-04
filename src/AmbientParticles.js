@@ -40,7 +40,9 @@ export default class AmbientParticles {
     // Slight floating / drifting animation
     const positions = this.particles.geometry.attributes.position.array;
     for (let i = 0; i < this.count * 3; i += 3) {
-      positions[i + 1] += Math.sin((i + performance.now() * this.speed) * 0.001) * 0.002;
+      positions[i + 0] += Math.sin((i + performance.now() * this.speed) * 0.003) * Math.random() * 0.1;
+      positions[i + 1] += Math.sin((i + performance.now() * this.speed) * 0.001) * Math.random() * 0.1;
+      positions[i + 1] += Math.sin((i + performance.now() * this.speed) * 0.002) * Math.random() * 0.1;
     }
     this.particles.geometry.attributes.position.needsUpdate = true;
   }

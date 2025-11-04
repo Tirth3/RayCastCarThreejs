@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
-import { OBJLoader } from 'three/examples/jsm/Addons.js';
+import { MTLLoader, OBJLoader } from 'three/examples/jsm/Addons.js';
 
 export default class Car {
-  constructor({ scene, world, listner , manager, mass = 150 }) {
+  constructor({ scene, world, listner, manager, mass = 150 }) {
     if (!scene) throw new Error('Car: scene is required');
     if (!world) throw new Error('Car: world is required');
 
@@ -64,36 +64,52 @@ export default class Car {
       this.brakeSound.pitch = 1000;
     });
 
-    const loader = new OBJLoader(manager);
-    loader.load('/models/truck.obj',
-      (object) => {
-        object.traverse((child) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-            child.material = new THREE.MeshStandardMaterial({ color: 0xaa1111 });
+    const mtlLoader = new MTLLoader(manager);
+    mtlLoader.load(
+      '/models/truck.mtl',
+      (materials) => {
+        materials.preload();
+
+        const loader = new OBJLoader(manager);
+        loader.setMaterials(materials);
+
+        loader.load('/models/truck.obj',
+          (object) => {
+            object.traverse((child) => {
+              if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                // child.material = new THREE.MeshStandardMaterial({});
+              }
+            });
+            // Optionally scale the model
+            object.scale.set(1.3, 0.75, 1.2);
+
+            // Center the model
+            object.position.set(0, 2, 0);
+            object.add(this.sound);
+            object.add(this.brakeSound);
+
+            // Add to scene
+            this.scene.add(object);
+
+            // Save reference for updates
+            this.ChassisMesh = object;
+            this.isready = true;
+          },
+          (xhr) => {
+            console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+          },
+          (error) => {
+            console.error('Error loading OBJ:', error);
           }
-        });
-        // Optionally scale the model
-        object.scale.set(1.3, 0.75, 1.2);
-
-        // Center the model
-        object.position.set(0, 2, 0);
-        object.add(this.sound);
-        object.add(this.brakeSound);
-
-        // Add to scene
-        this.scene.add(object);
-
-        // Save reference for updates
-        this.ChassisMesh = object;
-        this.isready = true;
+        );
       },
       (xhr) => {
-        console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+        console.log((xhr.loaded / xhr.total) * 100 + '% mtl loaded');
       },
       (error) => {
-        console.error('Error loading OBJ:', error);
+        console.error('Error loading mtl:', error);
       }
     );
     // this.ChassisMesh.add(this.sound);
@@ -178,7 +194,7 @@ export default class Car {
   // Call every frame: sync three meshes with cannon bodies
   Update() {
     if (!this.isready) return;
-    if(!this.ChassisBody.position) return;
+    if (!this.ChassisBody.position) return;
     // sync chassis
     this.ChassisMesh.position.copy(this.ChassisBody.position);
     this.ChassisMesh.quaternion.copy(this.ChassisBody.quaternion);
@@ -231,7 +247,7 @@ export default class Car {
 
     // Apply the new quaternion to the chassis body
     chassisBody.quaternion.copy(newQuaternion);
-    chassisBody.position.set(chassisBody.position.x, 3,chassisBody.position.z);
+    chassisBody.position.set(chassisBody.position.x, 3, chassisBody.position.z);
   }
 
   playBrakeSound(isbraking) {
@@ -243,7 +259,7 @@ export default class Car {
         this.brakeSound.play();
       // this.brakeSound.play();
     }
-    if(!isbraking)
+    if (!isbraking)
       this.brakeSound.stop();
 
   }

@@ -2,6 +2,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import './style.css'
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/examples/jsm/Addons.js';
 import * as CANNON from 'cannon-es';
 import CannonDebugger from 'cannon-es-debugger';
 
@@ -47,6 +48,7 @@ manager.onError = function (url) {
 
 // --- THREE.js setup ---
 const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0xffffff , 0.01);
 scene.background = new THREE.Color(0xaaaaaa);
 
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
@@ -65,7 +67,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 // document.body.style.margin = '0';
 // document.body.appendChild(renderer.domElement);
-
+// const composer = new EffectComposer(renderer , camera);
 // Orbit controls
 //const controls = new OrbitControls(camera, renderer.domElement);
 //controls.target.set(0, 1, 0);
@@ -117,33 +119,6 @@ scene.add(groundMesh);
 //scene.add(axesHelper);
 const cannonDebugger = new CannonDebugger(scene, world);
 
-
-// Sphere (CANNON + THREE)
-// const radius = 2;
-// const sphereShape = new CANNON.Sphere(radius);
-// const sphereBody = new CANNON.Body({ mass: 1 });
-// sphereBody.addShape(sphereShape);
-// sphereBody.position.set(8, 10, 5);
-// sphereBody.angularDamping = 0.1;
-// world.addBody(sphereBody);
-
-// const sphereGeo = new THREE.SphereGeometry(radius, 32, 24);
-// const sphereMat = new THREE.MeshStandardMaterial({ color: 0x2194ce, metalness: 0.2, roughness: 0.3 });
-// const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
-// sphereMesh.castShadow = true;
-// scene.add(sphereMesh);
-
-// Contact materials (optional)
-const groundMatPhys = new CANNON.Material('groundMat');
-const sphereMatPhys = new CANNON.Material('sphereMat');
-const contactMat = new CANNON.ContactMaterial(groundMatPhys, sphereMatPhys, {
-  friction: 0.4,
-  restitution: 0.3
-});
-world.addContactMaterial(contactMat);
-groundBody.material = groundMatPhys;
-// sphereBody.material = sphereMatPhys;
-
 const car = new Car({ scene: scene, world: world, listner: listner, manager: manager });
 let textgeo = [];
 textgeo.push(new CharacterBox({
@@ -175,14 +150,15 @@ textgeo.push(new CharacterBox({
   position: new THREE.Vector3(0, 0, 10),
 }));
 
-// const signpost = new StaticObj({
-//   scene : scene,
-//   world: world,
-//   position : new THREE.Vector3(0 , 2 , 10),
-//   scale : new THREE.Vector3(3 , 3 , 3),
-//   objpath: '/models/signpost.obj',
-//   mtlpath: '/models/signpost.mtl',
-// });
+const signpost = new StaticObj({
+  scene : scene,
+  world: world,
+  position : new THREE.Vector3(0 , 2 , 15),
+  scale : new THREE.Vector3(3 , 3 , 3),
+  objpath: '/models/signpost.obj',
+  mtlpath: '/models/signpost.mtl',
+  manager: manager,
+});
 
 function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new THREE.Vector3(1, 1, 1)) {
   let chars = [];
@@ -226,6 +202,7 @@ const ambient = new AmbientParticles(scene, {
   area: 200,
   color: 0x99ccff,
   size: 0.1,
+  speed: 0.1,
 });
 
 // --- Follow Camera Helper ---
