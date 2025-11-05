@@ -46,7 +46,7 @@ manager.onError = function (url) {
 
 // --- THREE.js setup ---
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0xffffff , 0.01);
+scene.fog = new THREE.FogExp2(0xffffff, 0.01);
 scene.background = new THREE.Color(0xaaaaaa);
 
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
@@ -106,9 +106,9 @@ groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
 
 // Orbit controls 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 1, 0);
-controls.update();
+// const controls = new OrbitControls(camera, renderer.domElement);
+// controls.target.set(0, 1, 0);
+// controls.update();
 
 // Grid helper
 //const grid = new THREE.GridHelper(20, 20, 0x222222, 0x222222);
@@ -151,104 +151,95 @@ textgeo.push(new CharacterBox({
 }));
 
 const staticobjs = [];
-staticobjs.push(new StaticObj({
-  scene : scene,
-  world: world,
-  position : new THREE.Vector3(-20 , 0 , 20),
-  scale : new THREE.Vector3(3 , 3 , 3),
-  objpath: '/models/obj/miscellaneous/Copper_Bars.obj',
-  mtlpath: '/models/obj/miscellaneous/Copper_Bars.mtl',
-  boxSize: new THREE.Vector3(3 , 2 , 3),    
-  boxOffset: new THREE.Vector3(0 , 1 , 0),
-  manager: manager,
-}));
+const paths = [
+  '/models/obj/miscellaneous/Copper_Bars',
+  '/models/obj/miscellaneous/Fuel_A_Barrels',
+  '/models/obj/miscellaneous/Gold_Bars_Stack_Large',
+  '/models/obj/miscellaneous/Textiles_B',
+  '/models/obj/miscellaneous/Stone_Chunks_Small',
+  '/models/obj/miscellaneous/Stone_Chunks_Large',
+  '/models/obj/miscellaneous/Wood_Planks_Stack_Medium'
+];
+const poss = [
+  [32, 0, -69],
+  [-63, 0, 4],
+  [-19, 0, 84],
+  [66, 0, -27],
+  [6, 0, 57],
+  [17, 0, 29],
+  [5, 0, 13],
+  [-51, 0, 0],
+  [-48, 0, -91],
+  [-60, 0, -82],
+  [-86, 0, 96],
+  [13, 0, -56],
+  [45, 0, 91],
+  [57, 0, -54],
+  [18, 0, 58],
+  [-20, 0, 68],
+  [77, 0, 59],
+  [-57, 0, 53],
+  [66, 0, 62],
+  [-85, 0, -71],
+  [-42, 0, -26],
+  [88, 0, -29],
+  [58, 0, -84],
+  [-87, 0, -62],
+  [96, 0, -38],
+  [57, 0, 24],
+  [39, 0, 83],
+  [13, 0, 31],
+  [39, 0, 97],
+  [-56, 0, 11],
+  [28, 0, 79],
+  [-98, 0, -69],
+  [26, 0, 17],
+  [44, 0, 60],
+  [-87, 0, -66],
+  [-76, 0, -28],
+  [100, 0, 29],
+  [-11, 0, 73],
+  [-34, 0, -72],
+  [48, 0, -39],
+  [5, 0, -21],
+  [67, 0, 99],
+  [-45, 0, 30],
+  [-96, 0, 43],
+  [-72, 0, 41],
+  [47, 0, -28],
+  [13, 0, -39],
+  [98, 0, -83],
+  [-36, 0, -15],
+  [35, 0, 18],
+];
 
-staticobjs.push(new StaticObj({
-  scene : scene,
-  world: world,
-  position : new THREE.Vector3(-25 , 0 , 20),
-  scale : new THREE.Vector3(3 , 3 , 3),
-  objpath: '/models/obj/miscellaneous/Fuel_A_Barrels.obj',
-  mtlpath: '/models/obj/miscellaneous/Fuel_A_Barrels.mtl',
-  boxSize: new THREE.Vector3(4 , 3 , 4),  
-  boxOffset: new THREE.Vector3(0 , 1.5 , 0),
-  manager: manager,
-}));
+for (let i = 0; i < poss.length; i++) {
+  const path = paths[Math.floor(Math.random() * paths.length)];
+  staticobjs.push(new StaticObj({
+    scene: scene,
+    world: world,
+    position: new THREE.Vector3(poss[i][0], poss[i][1], poss[i][2]),
+    scale: new THREE.Vector3(3, 3, 3),
+    objpath: path + '.obj',
+    mtlpath: path + '.mtl',
+    boxSize: new THREE.Vector3(3, 2, 3),
+    boxOffset: new THREE.Vector3(0, 1, 0),
+    manager: manager,
+  }));
+}
 
-
-staticobjs.push(new StaticObj({
-  scene : scene,
-  world: world,
-  position : new THREE.Vector3(-15 , 0 , 20),
-  scale : new THREE.Vector3(3 , 3 , 3),
-  objpath: '/models/obj/miscellaneous/Gold_Bars_Stack_Large.obj',
-  mtlpath: '/models/obj/miscellaneous/Gold_Bars_Stack_Large.mtl',
-  boxSize: new THREE.Vector3(5 , 5 , 5),    
-  boxOffset: new THREE.Vector3(0 , 2 , 0),
-  manager: manager,
-}));
-
-
-staticobjs.push(new StaticObj({
-  scene : scene,
-  world: world,
-  position : new THREE.Vector3(-10 , 0 , 20),
-  scale : new THREE.Vector3(3 , 3 , 3),
-  objpath: '/models/obj/miscellaneous/Textiles_B.obj',
-  mtlpath: '/models/obj/miscellaneous/Textiles_B.mtl',
-  boxSize: new THREE.Vector3(2 , 3 , 2),    
-  boxOffset: new THREE.Vector3(0 , 1 , 0),
-  manager: manager,
-}));
-
-staticobjs.push(new StaticObj({
-  scene : scene,
-  world: world,
-  position : new THREE.Vector3(-5 , 0 , 20),
-  scale : new THREE.Vector3(3 , 3 , 3),
-  objpath: '/models/obj/miscellaneous/Stone_Chunks_Small.obj',
-  mtlpath: '/models/obj/miscellaneous/Stone_Chunks_Small.mtl',
-  boxSize: new THREE.Vector3(2 , 2 , 2),
-  boxOffset: new THREE.Vector3(0 , 1 , 0),
-  manager: manager,
-}));
-
-staticobjs.push(new StaticObj({
-  scene : scene,
-  world: world,
-  position : new THREE.Vector3(0 , 0 , 20),
-  scale : new THREE.Vector3(3 , 3 , 3),
-  objpath: '/models/obj/miscellaneous/Stone_Chunks_Large.obj',
-  mtlpath: '/models/obj/miscellaneous/Stone_Chunks_Large.mtl',
-  boxSize: new THREE.Vector3(4 , 3 , 3),    
-  boxOffset: new THREE.Vector3(0 , 1 , 0),
-  manager: manager,
-}));
-
-staticobjs.push(new StaticObj({
-  scene : scene,
-  world: world,
-  position : new THREE.Vector3(5 , 0 , 20),
-  scale : new THREE.Vector3(3 , 3 , 3),
-  objpath: '/models/obj/miscellaneous/Wood_Planks_Stack_Medium.obj',
-  mtlpath: '/models/obj/miscellaneous/Wood_Planks_Stack_Medium.mtl',
-  boxSize: new THREE.Vector3(5 , 2.5 , 5),   
-  boxOffset: new THREE.Vector3(0 , 1 , 0),
-  manager: manager,
-}));
-
-const apl = ['A' , 'E' , 'F' , 'G'];
+const apl = ['A', 'E', 'F', 'G'];
 let map = [
-  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
-  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
-  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
-  [1 , 0 , 2 , -1 , -1 , -1 , -1 , -1 , -1 , -1],
-  [1 , 0 , 2 , -1 , -1 , -1 , -1 , -1 , -1 , -1],
-  [1 , 0 , 2 , -1 , -1 , -1 , -1 , 3 , 1 , 1],
-  [1 , 0 , 2 , -1 , -1 , -1 , -1 , 3 , 1 , 1],
-  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
-  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
-  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
+  [1, 0, 2, 1, 3, 0, 2, 3, 1, 1],
+  [1, 0, 2, 1, 3, 0, 2, 3, 1, 1],
+  [1, 0, 2, 1, 3, 0, 2, 3, 1, 1],
+  [1, 0, 2, -1, -1, -1, -1, -1, -1, -1],
+  [1, 0, 2, -1, -1, -1, -1, -1, -1, -1],
+  [1, 0, 2, -1, -1, -1, -1, 3, 1, 1],
+  [1, 0, 2, -1, -1, -1, -1, 3, 1, 1],
+  [1, 0, 2, 1, 3, 0, 2, 3, 1, 1],
+  [1, 0, 2, 1, 3, 0, 2, 3, 1, 1],
+  [1, 0, 2, 1, 3, 0, 2, 3, 1, 1],
 ];
 
 const center = {
@@ -265,7 +256,7 @@ for (let i = 0; i < map.length; i++) {
     const angle = Math.atan2(dx, dz); // face toward center
     const snappedAngle = Math.round(angle / (Math.PI / 2)) * (Math.PI / 2);
 
-    const path = '/models/obj/Buildings/building_' + apl[Math.floor(Math.random()*apl.length)] + '_withoutBase';
+    const path = '/models/obj/Buildings/building_' + apl[Math.floor(Math.random() * apl.length)] + '_withoutBase';
 
     staticobjs.push(new StaticObj({
       scene: scene,
@@ -547,7 +538,7 @@ function animate() {
   });
   // ambient.update(dt);
 
-  //updateCinematicFollowCamera(camera, car.ChassisBody, dt);
+  updateCinematicFollowCamera(camera, car.ChassisBody, dt);
   if (keys.debug)
     cannonDebugger.update(scene, camera);
   renderer.render(scene, camera);
