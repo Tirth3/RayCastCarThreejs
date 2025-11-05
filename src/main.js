@@ -10,6 +10,7 @@ import Car from './Car';
 import CharacterBox from './CharacterBox';
 import StaticObj from './StaticObj';
 import TriggerSphere from './TriggerSphere';
+import FramedImage from './FramedImage';
 
 // --- Loading Setup ---
 const loadingScreen = document.getElementById('loading-screen');
@@ -55,6 +56,7 @@ camera.fov = 45;
 
 
 const listner = new THREE.AudioListener();
+listner.setMasterVolume(0);
 camera.add(listner);
 
 const canvas = document.querySelector(".webgl");
@@ -149,7 +151,67 @@ textgeo.push(new CharacterBox({
   manager: manager,
   position: new THREE.Vector3(0, 0, 10),
 }));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: 'Click the SPHERE',
+  position: new THREE.Vector3(2, 0, -150),
+  rotation: new THREE.Vector3(Math.PI / 2, 0, 0),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 1.5,
+  height: 1.5,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+}));
 
+function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new THREE.Vector3(1, 1, 1)) {
+  let chars = [];
+  for (let i = text.length - 1; i >= 0; i--) {
+    //for (let i = 0; i < text.length; i++) {
+
+    chars.push(new CharacterBox({
+      scene: scene,
+      world: world,
+      font: '/Deluna_Regular.json',
+      text: text[i],
+      position: new THREE.Vector3(i * -2 + position.x, 0 + position.y, 0 + position.z),
+      scale: scale,
+      Size: 2,
+      height: 2,
+      depth: 1,
+      manager: manager,
+    }));
+    // textgeo.push(chars[i-1]);
+  }
+  return chars;
+}
+
+textgeo = textgeo.concat(create3DText("A WORLD", new THREE.Vector3(0, 10, 30), new THREE.Vector3(-1, 1, 1)));
+textgeo = textgeo.concat(create3DText("MADE FOR YOU", new THREE.Vector3(0, 5, 30), new THREE.Vector3(-1, 1, 1)));
+
+const trigger = new TriggerSphere({
+  scene,
+  camera,
+  world,
+  position: new THREE.Vector3(0, 2, -150),
+  radius: 1,
+  triggerRadius: 10,
+  color: 0xffaa00,
+});
+
+// --- Creating a Framed Image ---
+const frame = new FramedImage({
+  imageUrl: '/BGpic.jpg',
+  position: new THREE.Vector3(-5, 5 , 15),
+  rotation: new THREE.Euler(Math.PI , Math.PI / 2 , Math.PI),
+  scale: new THREE.Vector3(2 , 2 , 2),
+  world:world,
+  scene:scene,
+});
+
+// --- Random object scattered around ---
 const staticobjs = [];
 const paths = [
   '/models/obj/miscellaneous/Copper_Bars',
@@ -228,6 +290,7 @@ for (let i = 0; i < poss.length; i++) {
   }));
 }
 
+// --- Procedural City ---
 const apl = ['A', 'E', 'F', 'G'];
 let map = [
   [1, 0, 2, 1, 3, 0, 2, 3, 1, 1],
@@ -272,41 +335,6 @@ for (let i = 0; i < map.length; i++) {
     }));
   }
 }
-
-function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new THREE.Vector3(1, 1, 1)) {
-  let chars = [];
-  for (let i = text.length - 1; i >= 0; i--) {
-    //for (let i = 0; i < text.length; i++) {
-
-    chars.push(new CharacterBox({
-      scene: scene,
-      world: world,
-      font: '/Deluna_Regular.json',
-      text: text[i],
-      position: new THREE.Vector3(i * -2 + position.x, 0 + position.y, 0 + position.z),
-      scale: scale,
-      Size: 2,
-      height: 2,
-      depth: 1,
-      manager: manager,
-    }));
-    // textgeo.push(chars[i-1]);
-  }
-  return chars;
-}
-
-textgeo = textgeo.concat(create3DText("POOKIE", new THREE.Vector3(0, 10, 30), new THREE.Vector3(-1, 1, 1)));
-textgeo = textgeo.concat(create3DText("TATYAAA", new THREE.Vector3(0, 5, 30), new THREE.Vector3(-1, 1, 1)));
-
-const trigger = new TriggerSphere({
-  scene,
-  camera,
-  world,
-  position: new THREE.Vector3(0, 2, -150),
-  radius: 1,
-  triggerRadius: 10,
-  color: 0xffaa00,
-});
 
 // --- Follow Camera Helper ---
 // Persistent vectors for smooth transitions
@@ -500,7 +528,25 @@ function animate() {
   trigger.update(car.ChassisBody);
 
   if (trigger.consumeClick())
-    alert("HELLO");
+    alert(`Beneath the silver moon’s embrace, where stars in silence gleam,
+I, Emperor of Talajai, confess a long-kept dream.
+Your name, O Princess of Mahur, whispers through my soul,
+Each breath I take, each dawn I meet, makes my heart less whole.
+
+Your eyes — twin galaxies, where even kings would lose their reign,
+Your smile — a dawn that melts the frost of centuries of pain.
+No throne, no crown, no war I’ve won could ever stand as high,
+As the joy of hearing your laughter kiss the sky.
+
+I’ve conquered lands, yet you’ve conquered me,
+With a glance, a word, a mystery.
+Let kingdoms bow, let empires fade,
+For love like ours can never trade.
+
+So here I kneel — not as a ruler, but as a man,
+Offering not riches, but all I am.
+Will you, Princess of Mahur, make my world divine,
+And let our hearts, not borders, intertwine?`);
 
   // apply forces or any physics operation
   // Apply car control forces
@@ -537,6 +583,7 @@ function animate() {
     item.update();
   });
   // ambient.update(dt);
+  frame.update();
 
   updateCinematicFollowCamera(camera, car.ChassisBody, dt);
   if (keys.debug)
