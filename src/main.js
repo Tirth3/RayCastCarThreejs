@@ -2,7 +2,6 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import './style.css'
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { EffectComposer } from 'three/examples/jsm/Addons.js';
 import * as CANNON from 'cannon-es';
 import CannonDebugger from 'cannon-es-debugger';
 
@@ -11,7 +10,6 @@ import Car from './Car';
 import CharacterBox from './CharacterBox';
 import StaticObj from './StaticObj';
 import TriggerSphere from './TriggerSphere';
-import AmbientParticles from './AmbientParticles.js';
 
 // --- Loading Setup ---
 const loadingScreen = document.getElementById('loading-screen');
@@ -62,16 +60,13 @@ camera.add(listner);
 const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-// renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setPixelRatio(2);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 // document.body.style.margin = '0';
 // document.body.appendChild(renderer.domElement);
 // const composer = new EffectComposer(renderer , camera);
 // Orbit controls
-//const controls = new OrbitControls(camera, renderer.domElement);
-//controls.target.set(0, 1, 0);
-//controls.update();
 
 // Lights
 const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
@@ -110,13 +105,18 @@ groundMesh.receiveShadow = true;
 groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
 
+// Orbit controls 
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 1, 0);
+controls.update();
+
 // Grid helper
 //const grid = new THREE.GridHelper(20, 20, 0x222222, 0x222222);
 //grid.material.opacity = 0.25;
 //grid.material.transparent = true;
 //scene.add(grid);
-//const axesHelper = new THREE.AxesHelper(5);
-//scene.add(axesHelper);
+const axesHelper = new THREE.AxesHelper(5);
+scene.add(axesHelper);
 const cannonDebugger = new CannonDebugger(scene, world);
 
 const car = new Car({ scene: scene, world: world, listner: listner, manager: manager });
@@ -150,15 +150,137 @@ textgeo.push(new CharacterBox({
   position: new THREE.Vector3(0, 0, 10),
 }));
 
-const signpost = new StaticObj({
+const staticobjs = [];
+staticobjs.push(new StaticObj({
   scene : scene,
   world: world,
-  position : new THREE.Vector3(0 , 2 , 15),
+  position : new THREE.Vector3(-20 , 0 , 20),
   scale : new THREE.Vector3(3 , 3 , 3),
-  objpath: '/models/signpost.obj',
-  mtlpath: '/models/signpost.mtl',
+  objpath: '/models/obj/miscellaneous/Copper_Bars.obj',
+  mtlpath: '/models/obj/miscellaneous/Copper_Bars.mtl',
+  boxSize: new THREE.Vector3(3 , 2 , 3),    
+  boxOffset: new THREE.Vector3(0 , 1 , 0),
   manager: manager,
-});
+}));
+
+staticobjs.push(new StaticObj({
+  scene : scene,
+  world: world,
+  position : new THREE.Vector3(-25 , 0 , 20),
+  scale : new THREE.Vector3(3 , 3 , 3),
+  objpath: '/models/obj/miscellaneous/Fuel_A_Barrels.obj',
+  mtlpath: '/models/obj/miscellaneous/Fuel_A_Barrels.mtl',
+  boxSize: new THREE.Vector3(4 , 3 , 4),  
+  boxOffset: new THREE.Vector3(0 , 1.5 , 0),
+  manager: manager,
+}));
+
+
+staticobjs.push(new StaticObj({
+  scene : scene,
+  world: world,
+  position : new THREE.Vector3(-15 , 0 , 20),
+  scale : new THREE.Vector3(3 , 3 , 3),
+  objpath: '/models/obj/miscellaneous/Gold_Bars_Stack_Large.obj',
+  mtlpath: '/models/obj/miscellaneous/Gold_Bars_Stack_Large.mtl',
+  boxSize: new THREE.Vector3(5 , 5 , 5),    
+  boxOffset: new THREE.Vector3(0 , 2 , 0),
+  manager: manager,
+}));
+
+
+staticobjs.push(new StaticObj({
+  scene : scene,
+  world: world,
+  position : new THREE.Vector3(-10 , 0 , 20),
+  scale : new THREE.Vector3(3 , 3 , 3),
+  objpath: '/models/obj/miscellaneous/Textiles_B.obj',
+  mtlpath: '/models/obj/miscellaneous/Textiles_B.mtl',
+  boxSize: new THREE.Vector3(2 , 3 , 2),    
+  boxOffset: new THREE.Vector3(0 , 1 , 0),
+  manager: manager,
+}));
+
+staticobjs.push(new StaticObj({
+  scene : scene,
+  world: world,
+  position : new THREE.Vector3(-5 , 0 , 20),
+  scale : new THREE.Vector3(3 , 3 , 3),
+  objpath: '/models/obj/miscellaneous/Stone_Chunks_Small.obj',
+  mtlpath: '/models/obj/miscellaneous/Stone_Chunks_Small.mtl',
+  boxSize: new THREE.Vector3(2 , 2 , 2),
+  boxOffset: new THREE.Vector3(0 , 1 , 0),
+  manager: manager,
+}));
+
+staticobjs.push(new StaticObj({
+  scene : scene,
+  world: world,
+  position : new THREE.Vector3(0 , 0 , 20),
+  scale : new THREE.Vector3(3 , 3 , 3),
+  objpath: '/models/obj/miscellaneous/Stone_Chunks_Large.obj',
+  mtlpath: '/models/obj/miscellaneous/Stone_Chunks_Large.mtl',
+  boxSize: new THREE.Vector3(4 , 3 , 3),    
+  boxOffset: new THREE.Vector3(0 , 1 , 0),
+  manager: manager,
+}));
+
+staticobjs.push(new StaticObj({
+  scene : scene,
+  world: world,
+  position : new THREE.Vector3(5 , 0 , 20),
+  scale : new THREE.Vector3(3 , 3 , 3),
+  objpath: '/models/obj/miscellaneous/Wood_Planks_Stack_Medium.obj',
+  mtlpath: '/models/obj/miscellaneous/Wood_Planks_Stack_Medium.mtl',
+  boxSize: new THREE.Vector3(5 , 2.5 , 5),   
+  boxOffset: new THREE.Vector3(0 , 1 , 0),
+  manager: manager,
+}));
+
+const apl = ['A' , 'E' , 'F' , 'G'];
+let map = [
+  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
+  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
+  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
+  [1 , 0 , 2 , -1 , -1 , -1 , -1 , -1 , -1 , -1],
+  [1 , 0 , 2 , -1 , -1 , -1 , -1 , -1 , -1 , -1],
+  [1 , 0 , 2 , -1 , -1 , -1 , -1 , 3 , 1 , 1],
+  [1 , 0 , 2 , -1 , -1 , -1 , -1 , 3 , 1 , 1],
+  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
+  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
+  [1 , 0 , 2 , 1 , 3 , 0 , 2 , 3 , 1 , 1],
+];
+
+const center = {
+  x: (map.length - 1) / 2,
+  y: (map.length - 1) / 2,
+};
+
+for (let i = 0; i < map.length; i++) {
+  for (let j = 0; j < map.length; j++) {
+    if (map[i][j] == -1) continue;
+
+    const dx = center.x - i;
+    const dz = center.y - j;
+    const angle = Math.atan2(dx, dz); // face toward center
+    const snappedAngle = Math.round(angle / (Math.PI / 2)) * (Math.PI / 2);
+
+    const path = '/models/obj/Buildings/building_' + apl[Math.floor(Math.random()*apl.length)] + '_withoutBase';
+
+    staticobjs.push(new StaticObj({
+      scene: scene,
+      world: world,
+      position: new THREE.Vector3((i * 10) - 50, 0, (j * 15) - 200),
+      scale: new THREE.Vector3(3, 3, 3),
+      rotation: new THREE.Vector3(0, snappedAngle, 0),
+      objpath: path + '.obj',
+      mtlpath: path + '.mtl',
+      boxSize: new THREE.Vector3(5, 2.5, 5),
+      boxOffset: new THREE.Vector3(0, 1, 0),
+      manager: manager,
+    }));
+  }
+}
 
 function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new THREE.Vector3(1, 1, 1)) {
   let chars = [];
@@ -182,28 +304,18 @@ function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new T
   return chars;
 }
 
-const name1 = create3DText("TATYAAA", new THREE.Vector3(0, 5, 30), new THREE.Vector3(-1, 1, 1));
-const name2 = create3DText("POOKIE", new THREE.Vector3(0, 10, 30), new THREE.Vector3(-1, 1, 1));
-textgeo = textgeo.concat(name1);
-textgeo = textgeo.concat(name2);
+textgeo = textgeo.concat(create3DText("POOKIE", new THREE.Vector3(0, 10, 30), new THREE.Vector3(-1, 1, 1)));
+textgeo = textgeo.concat(create3DText("TATYAAA", new THREE.Vector3(0, 5, 30), new THREE.Vector3(-1, 1, 1)));
 
 const trigger = new TriggerSphere({
   scene,
   camera,
   world,
-  position: new THREE.Vector3(10, 2, 5),
+  position: new THREE.Vector3(0, 2, -150),
   radius: 1,
   triggerRadius: 10,
   color: 0xffaa00,
 });
-
-// const ambient = new AmbientParticles(scene, {
-//   count: 50000,
-//   area: 200,
-//   color: 0x99ccff,
-//   size: 0.1,
-//   speed: 0.1,
-// });
 
 // --- Follow Camera Helper ---
 // Persistent vectors for smooth transitions
@@ -435,7 +547,7 @@ function animate() {
   });
   // ambient.update(dt);
 
-  updateCinematicFollowCamera(camera, car.ChassisBody, dt);
+  //updateCinematicFollowCamera(camera, car.ChassisBody, dt);
   if (keys.debug)
     cannonDebugger.update(scene, camera);
   renderer.render(scene, camera);

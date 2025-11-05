@@ -14,6 +14,7 @@ export default class StaticObj {
     mtlpath,
     manager,
     boxSize = new THREE.Vector3(1, 1, 1), // Custom size for physics box
+    boxOffset = new THREE.Vector3(),
     color = 0xffffff,
   }) {
     this.scene = scene;
@@ -35,27 +36,24 @@ export default class StaticObj {
         objLoader.load(
           objpath,
           (object) => {
-            // ✅ Apply transforms
+            // Apply transforms
             object.scale.copy(scale);
             object.rotation.set(rotation.x, rotation.y, rotation.z);
             object.position.copy(position);
 
-            // ✅ Shadows
+            // Shadows
             object.traverse((child) => {
               if (child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
-                if (child.material) {
-                  child.material = new THREE.MeshStandardMaterial({ color });
-                }
               }
             });
 
-            // ✅ Add to scene
+            // Add to scene
             this.scene.add(object);
             this.mesh = object;
 
-            // ✅ Create simple box physics body using provided size
+            // Create simple box physics body using provided size
             const halfExtents = new CANNON.Vec3(
               boxSize.x / 2,
               boxSize.y / 2,
@@ -64,8 +62,11 @@ export default class StaticObj {
             const shape = new CANNON.Box(halfExtents);
             const body = new CANNON.Body({
               mass: 0, // static object
-              shape,
             });
+
+            body.addShape(shape , boxOffset);
+
+            
 
             body.position.set(position.x, position.y, position.z);
             this.world.addBody(body);
