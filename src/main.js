@@ -153,7 +153,7 @@ textgeo.push(new CharacterBox({
   position: new THREE.Vector3(0, 0, 10),
 }));
 
-function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new THREE.Vector3(1, 1, 1) , size = 2 , height = 2 , depth = 1) {
+function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new THREE.Vector3(1, 1, 1), size = 2, height = 2, depth = 1) {
   let chars = [];
   for (let i = text.length - 1; i >= 0; i--) {
     //for (let i = 0; i < text.length; i++) {
@@ -175,7 +175,7 @@ function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new T
   return chars;
 }
 
-textgeo = textgeo.concat(create3DText("MRs.", new THREE.Vector3(13, 15, 30), new THREE.Vector3(-1 , 1 , 1) , 4 , 4));
+textgeo = textgeo.concat(create3DText("MRs.", new THREE.Vector3(13, 15, 30), new THREE.Vector3(-1, 1, 1), 4, 4));
 textgeo = textgeo.concat(create3DText("KUMBHAR", new THREE.Vector3(0, 10, 30), new THREE.Vector3(-1, 1, 1)));
 textgeo = textgeo.concat(create3DText("PRATIKSHA", new THREE.Vector3(0, 5, 30), new THREE.Vector3(-1, 1, 1)));
 
@@ -206,24 +206,38 @@ textgeo.push(new CharacterBox({
 
 // Image frames
 const frames = [];
+// Static Objects
+const staticobjs = [];
 
 // --- Timeline ---
-const timelineoffset = new THREE.Vector3(-50 , 0 , 0);
+const timelineoffset = new THREE.Vector3(-50, 0, 0);
 
 // first
 frames.push(new FramedImage({
   imageUrl: '/BGpic.jpg',
-  position: timelineoffset,
-  rotation: new THREE.Euler(Math.PI / 2, Math.PI , -Math.PI / 2),
-  scale: new THREE.Vector3(2 , 2 , 2),
-  world:world,
-  scene:scene,
+  position: new THREE.Vector3(-15 + timelineoffset.x , timelineoffset.y , 0 + timelineoffset.z),
+  rotation: new THREE.Euler(Math.PI / 2, Math.PI, -Math.PI / 2),
+  scale: new THREE.Vector3(2, 2, 2),
+  world: world,
+  scene: scene,
+}));
+staticobjs.push(new StaticObj({
+  scene: scene,
+  world: world,
+  position: new THREE.Vector3(5 + timelineoffset.x , timelineoffset.y , 15 + timelineoffset.z),
+  // scale: new THREE.Vector3(3, 3, 3),
+  rotation: new THREE.Vector3(0, -Math.PI / 2, 0),
+  objpath: '/models/signpost.obj',
+  mtlpath: '/models/signpost.mtl',
+  boxSize: new THREE.Vector3(1, 2.5, 1),
+  boxOffset: new THREE.Vector3(0, 1, 0),
+  manager: manager,
 }));
 textgeo.push(new CharacterBox({
   scene: scene,
   world: world,
   font: '/Deluna_Regular.json',
-  text: `First Year - The Spark I Hid`,
+  text: `First Year - The Spark I Hide`,
   position: new THREE.Vector3(-10 + timelineoffset.x, 0 + timelineoffset.y, 0 + timelineoffset.z),
   rotation: new THREE.Vector3(Math.PI / 2, 0, Math.PI / 2),
   scale: new THREE.Vector3(-1, 1, 1),
@@ -254,11 +268,11 @@ A silent spark I couldn’t show, yet always felt`,
 // second
 frames.push(new FramedImage({
   imageUrl: '/BGpic.jpg',
-  position: new THREE.Vector3(timelineoffset.x , timelineoffset.y , timelineoffset.z + 30),
-  rotation: new THREE.Euler(Math.PI / 2, Math.PI , -Math.PI / 2),
-  scale: new THREE.Vector3(2 , 2 , 2),
-  world:world,
-  scene:scene,
+  position: new THREE.Vector3(-15 + timelineoffset.x, timelineoffset.y, timelineoffset.z + 30),
+  rotation: new THREE.Euler(Math.PI / 2, Math.PI, -Math.PI / 2),
+  scale: new THREE.Vector3(2, 2, 2),
+  world: world,
+  scene: scene,
 }));
 textgeo.push(new CharacterBox({
   scene: scene,
@@ -295,11 +309,11 @@ My heart would race - you never knew.`,
 // Third
 frames.push(new FramedImage({
   imageUrl: '/BGpic.jpg',
-  position: new THREE.Vector3(timelineoffset.x , timelineoffset.y , timelineoffset.z + 60),
-  rotation: new THREE.Euler(Math.PI / 2, Math.PI , -Math.PI / 2),
-  scale: new THREE.Vector3(2 , 2 , 2),
-  world:world,
-  scene:scene,
+  position: new THREE.Vector3(-15 + timelineoffset.x, timelineoffset.y, timelineoffset.z + 60),
+  rotation: new THREE.Euler(Math.PI / 2, Math.PI, -Math.PI / 2),
+  scale: new THREE.Vector3(2, 2, 2),
+  world: world,
+  scene: scene,
 }));
 textgeo.push(new CharacterBox({
   scene: scene,
@@ -336,11 +350,11 @@ You smiled - and silence won again.`,
 // fourth
 frames.push(new FramedImage({
   imageUrl: '/BGpic.jpg',
-  position: new THREE.Vector3(timelineoffset.x , timelineoffset.y , timelineoffset.z + 90),
-  rotation: new THREE.Euler(Math.PI / 2, Math.PI , -Math.PI / 2),
-  scale: new THREE.Vector3(2 , 2 , 2),
-  world:world,
-  scene:scene,
+  position: new THREE.Vector3(-15 + timelineoffset.x, timelineoffset.y, timelineoffset.z + 90),
+  rotation: new THREE.Euler(Math.PI / 2, Math.PI, -Math.PI / 2),
+  scale: new THREE.Vector3(2, 2, 2),
+  world: world,
+  scene: scene,
 }));
 textgeo.push(new CharacterBox({
   scene: scene,
@@ -375,7 +389,6 @@ I’ve loved you quietly, all this while, my dear.`,
 }));
 
 // --- Random object scattered around ---
-const staticobjs = [];
 const paths = [
   '/models/obj/miscellaneous/Copper_Bars',
   '/models/obj/miscellaneous/Fuel_A_Barrels',
@@ -385,6 +398,86 @@ const paths = [
   '/models/obj/miscellaneous/Stone_Chunks_Large',
   '/models/obj/miscellaneous/Wood_Planks_Stack_Medium'
 ];
+staticobjs.push(new StaticObj({
+  scene: scene,
+  world: world,
+  position: new THREE.Vector3(0, 3, 15),
+  // scale: new THREE.Vector3(3, 3, 3),
+  rotation: new THREE.Vector3(0, Math.PI, 0),
+  objpath: '/models/signpost.obj',
+  mtlpath: '/models/signpost.mtl',
+  boxSize: new THREE.Vector3(1, 2.5, 1),
+  boxOffset: new THREE.Vector3(0, 1, 0),
+  manager: manager,
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: `Timeline`,
+  position: new THREE.Vector3(-2 , 6 , 14),
+  rotation: new THREE.Vector3(0 , 0 , 0),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 0.5,
+  height: 0.5,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+}));
+
+staticobjs.push(new StaticObj({
+  scene: scene,
+  world: world,
+  position: new THREE.Vector3(0, 2, 15),
+  // scale: new THREE.Vector3(3, 3, 3),
+  rotation: new THREE.Vector3(0, 0 , 0),
+  objpath: '/models/signpost.obj',
+  mtlpath: '/models/signpost.mtl',
+  boxSize: new THREE.Vector3(1, 2.5, 1),
+  boxOffset: new THREE.Vector3(0, 1, 0),
+  manager: manager,
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: `THE CITY`,
+  position: new THREE.Vector3(0 , 7 , 12),
+  rotation: new THREE.Vector3(0 , Math.PI / 2 , 0),
+  scale: new THREE.Vector3(1, 1, 1),
+  Size: 0.5,
+  height: 0.5,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+}));
+
+staticobjs.push(new StaticObj({
+  scene: scene,
+  world: world,
+  position: new THREE.Vector3(0, 4, 15),
+  // scale: new THREE.Vector3(3, 3, 3),
+  rotation: new THREE.Vector3(0, Math.PI / 2, 0),
+  objpath: '/models/signpost.obj',
+  mtlpath: '/models/signpost.mtl',
+  boxSize: new THREE.Vector3(1, 2.5, 1),
+  boxOffset: new THREE.Vector3(0, 1, 0),
+  manager: manager,
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: `Poems Maybe`,
+  position: new THREE.Vector3(3 , 5 , 14),
+  rotation: new THREE.Vector3(0 , 0 , 0),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 0.5,
+  height: 0.5,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+}));
 
 // --- Procedural City ---
 const apl = ['A', 'E', 'F', 'G'];
@@ -445,7 +538,7 @@ export function updateCinematicFollowCamera(camera, carBody, deltaTime) {
   const lookSmoothness = 2.0;     // how smoothly camera rotates
   const lookDistance = 5.0;       // how far ahead of the car to look
   const offset = new THREE.Vector3(10, 20, -10); // world-space offset (corner view)
-  if(isMobile){offset.x = 30 ; offset.y = 30 ; offset.z = -20;}
+  if (isMobile) { offset.x = 30; offset.y = 30; offset.z = -20; }
   // --- Compute desired camera position ---
   const desiredPos = new THREE.Vector3().copy(carBody.position).add(offset);
 
