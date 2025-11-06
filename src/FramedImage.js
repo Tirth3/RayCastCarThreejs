@@ -63,7 +63,7 @@ export default class FramedImage {
       new CANNON.Vec3(
         4.5,
         3.5,
-        0.5
+        1
       )
     );
 

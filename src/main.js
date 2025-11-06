@@ -11,6 +11,7 @@ import CharacterBox from './CharacterBox';
 import StaticObj from './StaticObj';
 import TriggerSphere from './TriggerSphere';
 import FramedImage from './FramedImage';
+import { time } from 'three/tsl';
 
 // --- Loading Setup ---
 const loadingScreen = document.getElementById('loading-screen');
@@ -151,22 +152,8 @@ textgeo.push(new CharacterBox({
   manager: manager,
   position: new THREE.Vector3(0, 0, 10),
 }));
-textgeo.push(new CharacterBox({
-  scene: scene,
-  world: world,
-  font: '/Deluna_Regular.json',
-  text: 'Click the SPHERE',
-  position: new THREE.Vector3(2, 0, -150),
-  rotation: new THREE.Vector3(Math.PI / 2, 0, 0),
-  scale: new THREE.Vector3(-1, 1, 1),
-  Size: 1.5,
-  height: 1.5,
-  depth: 0.5,
-  mass: 0,
-  manager: manager,
-}));
 
-function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new THREE.Vector3(1, 1, 1)) {
+function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new THREE.Vector3(1, 1, 1) , size = 2 , height = 2 , depth = 1) {
   let chars = [];
   for (let i = text.length - 1; i >= 0; i--) {
     //for (let i = 0; i < text.length; i++) {
@@ -176,11 +163,11 @@ function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new T
       world: world,
       font: '/Deluna_Regular.json',
       text: text[i],
-      position: new THREE.Vector3(i * -2 + position.x, 0 + position.y, 0 + position.z),
+      position: new THREE.Vector3(i * -size + position.x, 0 + position.y, 0 + position.z),
       scale: scale,
-      Size: 2,
-      height: 2,
-      depth: 1,
+      Size: size,
+      height: height,
+      depth: depth,
       manager: manager,
     }));
     // textgeo.push(chars[i-1]);
@@ -188,28 +175,204 @@ function create3DText(text, position = new THREE.Vector3(0, 0, 0), scale = new T
   return chars;
 }
 
-textgeo = textgeo.concat(create3DText("A WORLD", new THREE.Vector3(0, 10, 30), new THREE.Vector3(-1, 1, 1)));
-textgeo = textgeo.concat(create3DText("MADE FOR YOU", new THREE.Vector3(0, 5, 30), new THREE.Vector3(-1, 1, 1)));
+textgeo = textgeo.concat(create3DText("MRs.", new THREE.Vector3(13, 15, 30), new THREE.Vector3(-1 , 1 , 1) , 4 , 4));
+textgeo = textgeo.concat(create3DText("KUMBHAR", new THREE.Vector3(0, 10, 30), new THREE.Vector3(-1, 1, 1)));
+textgeo = textgeo.concat(create3DText("PRATIKSHA", new THREE.Vector3(0, 5, 30), new THREE.Vector3(-1, 1, 1)));
 
 const trigger = new TriggerSphere({
   scene,
   camera,
   world,
-  position: new THREE.Vector3(0, 2, -150),
+  position: new THREE.Vector3(0, 2, -100),
   radius: 1,
   triggerRadius: 10,
   color: 0xffaa00,
 });
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: 'Click the SPHERE',
+  position: new THREE.Vector3(2, 0, -100),
+  rotation: new THREE.Vector3(Math.PI / 2, 0, 0),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 1.5,
+  height: 1.5,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+}));
 
-// --- Creating a Framed Image ---
-const frame = new FramedImage({
+
+// Image frames
+const frames = [];
+
+// --- Timeline ---
+const timelineoffset = new THREE.Vector3(-50 , 0 , 0);
+
+// first
+frames.push(new FramedImage({
   imageUrl: '/BGpic.jpg',
-  position: new THREE.Vector3(-5, 5 , 15),
-  rotation: new THREE.Euler(Math.PI , Math.PI / 2 , Math.PI),
+  position: timelineoffset,
+  rotation: new THREE.Euler(Math.PI / 2, Math.PI , -Math.PI / 2),
   scale: new THREE.Vector3(2 , 2 , 2),
   world:world,
   scene:scene,
-});
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: `First Year - The Spark I Hid`,
+  position: new THREE.Vector3(-10 + timelineoffset.x, 0 + timelineoffset.y, 0 + timelineoffset.z),
+  rotation: new THREE.Vector3(Math.PI / 2, 0, Math.PI / 2),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 1.5,
+  height: 1.5,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+  color: 0xd00000,
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: `I saw you once, and time stood still,
+My heart spoke loud, but I stayed still.
+A silent spark I couldn’t show, yet always felt`,
+  position: new THREE.Vector3(-7 + timelineoffset.x, 0 + timelineoffset.y, 0 + timelineoffset.z),
+  rotation: new THREE.Vector3(Math.PI / 2, 0, Math.PI / 2),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 1,
+  height: 1,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+}));
+
+// second
+frames.push(new FramedImage({
+  imageUrl: '/BGpic.jpg',
+  position: new THREE.Vector3(timelineoffset.x , timelineoffset.y , timelineoffset.z + 30),
+  rotation: new THREE.Euler(Math.PI / 2, Math.PI , -Math.PI / 2),
+  scale: new THREE.Vector3(2 , 2 , 2),
+  world:world,
+  scene:scene,
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: `Second Year - The Hidden Feeling`,
+  position: new THREE.Vector3(-10 + timelineoffset.x, 0 + timelineoffset.y, 30 + timelineoffset.z),
+  rotation: new THREE.Vector3(Math.PI / 2, 0, Math.PI / 2),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 1.5,
+  height: 1.5,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+  color: 0xd00000,
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: `We talked, we laughed, I played it cool,
+Pretending calm while love took rule.
+My heart would race - you never knew.`,
+  position: new THREE.Vector3(-7 + timelineoffset.x, 0 + timelineoffset.y, 30 + timelineoffset.z),
+  rotation: new THREE.Vector3(Math.PI / 2, 0, Math.PI / 2),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 1,
+  height: 1,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+}));
+
+// Third
+frames.push(new FramedImage({
+  imageUrl: '/BGpic.jpg',
+  position: new THREE.Vector3(timelineoffset.x , timelineoffset.y , timelineoffset.z + 60),
+  rotation: new THREE.Euler(Math.PI / 2, Math.PI , -Math.PI / 2),
+  scale: new THREE.Vector3(2 , 2 , 2),
+  world:world,
+  scene:scene,
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: `Third Year - The Almost`,
+  position: new THREE.Vector3(-10 + timelineoffset.x, 0 + timelineoffset.y, 60 + timelineoffset.z),
+  rotation: new THREE.Vector3(Math.PI / 2, 0, Math.PI / 2),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 1.5,
+  height: 1.5,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+  color: 0xd00000,
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: `I almost said it, once or twice,
+But fear held back what would’ve been nice.
+You smiled - and silence won again.`,
+  position: new THREE.Vector3(-7 + timelineoffset.x, 0 + timelineoffset.y, 60 + timelineoffset.z),
+  rotation: new THREE.Vector3(Math.PI / 2, 0, Math.PI / 2),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 1,
+  height: 1,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+}));
+
+// fourth
+frames.push(new FramedImage({
+  imageUrl: '/BGpic.jpg',
+  position: new THREE.Vector3(timelineoffset.x , timelineoffset.y , timelineoffset.z + 90),
+  rotation: new THREE.Euler(Math.PI / 2, Math.PI , -Math.PI / 2),
+  scale: new THREE.Vector3(2 , 2 , 2),
+  world:world,
+  scene:scene,
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: `Fourth Year — The Confession`,
+  position: new THREE.Vector3(-10 + timelineoffset.x, 0 + timelineoffset.y, 90 + timelineoffset.z),
+  rotation: new THREE.Vector3(Math.PI / 2, 0, Math.PI / 2),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 1.5,
+  height: 1.5,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+  color: 0xd00000,
+}));
+textgeo.push(new CharacterBox({
+  scene: scene,
+  world: world,
+  font: '/Deluna_Regular.json',
+  text: `Now time runs out, the end is near,
+So I’ll speak the truth I’ve held for years:
+I’ve loved you quietly, all this while, my dear.`,
+  position: new THREE.Vector3(-7 + timelineoffset.x, 0 + timelineoffset.y, 90 + timelineoffset.z),
+  rotation: new THREE.Vector3(Math.PI / 2, 0, Math.PI / 2),
+  scale: new THREE.Vector3(-1, 1, 1),
+  Size: 1,
+  height: 1,
+  depth: 0.5,
+  mass: 0,
+  manager: manager,
+}));
 
 // --- Random object scattered around ---
 const staticobjs = [];
@@ -275,20 +438,20 @@ const poss = [
   [35, 0, 18],
 ];
 
-for (let i = 0; i < poss.length; i++) {
-  const path = paths[Math.floor(Math.random() * paths.length)];
-  staticobjs.push(new StaticObj({
-    scene: scene,
-    world: world,
-    position: new THREE.Vector3(poss[i][0], poss[i][1], poss[i][2]),
-    scale: new THREE.Vector3(3, 3, 3),
-    objpath: path + '.obj',
-    mtlpath: path + '.mtl',
-    boxSize: new THREE.Vector3(3, 2, 3),
-    boxOffset: new THREE.Vector3(0, 1, 0),
-    manager: manager,
-  }));
-}
+// for (let i = 0; i < poss.length; i++) {
+//   const path = paths[Math.floor(Math.random() * paths.length)];
+//   staticobjs.push(new StaticObj({
+//     scene: scene,
+//     world: world,
+//     position: new THREE.Vector3(poss[i][0], poss[i][1], poss[i][2]),
+//     scale: new THREE.Vector3(3, 3, 3),
+//     objpath: path + '.obj',
+//     mtlpath: path + '.mtl',
+//     boxSize: new THREE.Vector3(3, 2, 3),
+//     boxOffset: new THREE.Vector3(0, 1, 0),
+//     manager: manager,
+//   }));
+// }
 
 // --- Procedural City ---
 const apl = ['A', 'E', 'F', 'G'];
@@ -299,10 +462,10 @@ let map = [
   [1, 0, 2, -1, -1, -1, -1, -1, -1, -1],
   [1, 0, 2, -1, -1, -1, -1, -1, -1, -1],
   [1, 0, 2, -1, -1, -1, -1, 3, 1, 1],
-  [1, 0, 2, -1, -1, -1, -1, 3, 1, 1],
-  [1, 0, 2, 1, 3, 0, 2, 3, 1, 1],
-  [1, 0, 2, 1, 3, 0, 2, 3, 1, 1],
-  [1, 0, 2, 1, 3, 0, 2, 3, 1, 1],
+  [1, 0, 2, -1, 1, -1, -1, 3, 1, 1],
+  [1, 0, 2, 1, 1, 0, 2, 0, 1, 1],
+  [1, 0, 2, 3, 2, 1, 1, 2, 3, 1],
+  [1, 0, 2, 1, 3, 0, 2, 3, 0, 1],
 ];
 
 const center = {
@@ -324,7 +487,7 @@ for (let i = 0; i < map.length; i++) {
     staticobjs.push(new StaticObj({
       scene: scene,
       world: world,
-      position: new THREE.Vector3((i * 10) - 50, 0, (j * 15) - 200),
+      position: new THREE.Vector3((i * 10) - 50, 0, (j * 15) - 175),
       scale: new THREE.Vector3(3, 3, 3),
       rotation: new THREE.Vector3(0, snappedAngle, 0),
       objpath: path + '.obj',
@@ -348,8 +511,8 @@ export function updateCinematicFollowCamera(camera, carBody, deltaTime) {
   const followSmoothness = 5.0;   // how tightly camera follows position
   const lookSmoothness = 2.0;     // how smoothly camera rotates
   const lookDistance = 5.0;       // how far ahead of the car to look
-  const offset = new THREE.Vector3(20, 20, -10); // world-space offset (corner view)
-
+  const offset = new THREE.Vector3(10, 20, -10); // world-space offset (corner view)
+  if(isMobile){offset.x = 30 ; offset.y = 30 ; offset.z = -20;}
   // --- Compute desired camera position ---
   const desiredPos = new THREE.Vector3().copy(carBody.position).add(offset);
 
@@ -461,55 +624,8 @@ document.getElementById('right').addEventListener('touchend', () => keys.right =
 document.getElementById('reset').addEventListener('touchstart', () => car.resetCar());
 // document.getElementById('right').addEventListener('touchend', () => keys.right = false);
 
-// static boxes for checking
-function addRandomBlocks(scene, world, count = 50) {
-  const blocks = [];
-
-  const boxGeo = new THREE.BoxGeometry(1, 1, 1);
-
-  let j = 1;
-  // for (let j = 0 ; j < 10 ; j++)
-  for (let i = 0; i < count; i++) {
-    const boxMat = new THREE.MeshStandardMaterial({ color: (Math.random() - 0.5) * 127, metalness: 0.2, roughness: 0.8 });
-    // Random position on ground
-    /*const x = (Math.random() - 0.5) * 20;  // spread over ±10 meters
-    const z = (Math.random() - 0.5) * 20;
-    const y = -0.3; // half height, sitting on ground
-    */
-    let x = 2 * j;
-    const y = -0.3;
-    let z = i * 2;
-
-    if (i > count / 2) {
-      x = -2 * j;
-      z = (count - i) * 2 + 0.5;
-    }
-
-
-    // --- Cannon body ---
-    const halfExtents = new CANNON.Vec3(0.5, 0.5, 0.5);
-    const boxShape = new CANNON.Box(halfExtents);
-    const boxBody = new CANNON.Body({ mass: 0 }); // static
-    boxBody.addShape(boxShape);
-    boxBody.position.set(x, y, z);
-    world.addBody(boxBody);
-
-    // --- THREE mesh ---
-    const boxMesh = new THREE.Mesh(boxGeo, boxMat);
-    boxMesh.position.set(x, y, z);
-    boxMesh.castShadow = true;
-    boxMesh.receiveShadow = true;
-    scene.add(boxMesh);
-
-    blocks.push({ body: boxBody, mesh: boxMesh });
-  }
-
-  return blocks;
-}
-
-//const blocks = addRandomBlocks(scene, world);
 const maxEngineForce = 305;
-const maxBrakingForce = 10;
+const maxBrakingForce = 12;
 const maxSteerVal = 0.3;
 
 // Animation loop
@@ -526,7 +642,6 @@ function animate() {
   world.step(timeStep, dt, 1);
 
   trigger.update(car.ChassisBody);
-
   if (trigger.consumeClick())
     alert(`Beneath the silver moon’s embrace, where stars in silence gleam,
 I, Emperor of Talajai, confess a long-kept dream.
@@ -550,11 +665,10 @@ And let our hearts, not borders, intertwine?`);
 
   // apply forces or any physics operation
   // Apply car control forces
-
   const force = keys.forward ? -maxEngineForce : keys.backward ? maxEngineForce : 0;
   const steer = keys.left ? maxSteerVal : keys.right ? -maxSteerVal : 0;
   const brake = (keys.brake && (force == 0)) ? maxBrakingForce : 2;
-  // if(keys.brake)
+
   car.playBrakeSound(keys.brake);
 
   // Apply engine force
@@ -573,9 +687,8 @@ And let our hearts, not borders, intertwine?`);
   car.vehicle.setBrake(brake, 2);
   car.vehicle.setBrake(brake, 3);
 
-  // // Sync mesh and physics body
-  // sphereMesh.position.copy(sphereBody.position);
-  // sphereMesh.quaternion.copy(sphereBody.quaternion);
+  // Sync mesh and physics body
+
   car.limitSpeedSmooth(30, 0.9);
   car.Update();
   // textgeo.update();
@@ -583,7 +696,9 @@ And let our hearts, not borders, intertwine?`);
     item.update();
   });
   // ambient.update(dt);
-  frame.update();
+  frames.forEach((item) => {
+    item.update();
+  });
 
   updateCinematicFollowCamera(camera, car.ChassisBody, dt);
   if (keys.debug)
