@@ -23,17 +23,17 @@ export default class FramedImage {
 
     this.group = new THREE.Group();
 
-    // 🖼️ Create the photo mesh
+    // Create the photo mesh
     const textureLoader = new THREE.TextureLoader();
     const photoTexture = textureLoader.load(imageUrl);
     const photoGeometry = new THREE.PlaneGeometry(this.photoWidth, this.photoHeight);
     const photoMaterial = new THREE.MeshStandardMaterial({ map: photoTexture });
     const photoMesh = new THREE.Mesh(photoGeometry, photoMaterial);
 
-    // 🪵 Frame material
+    // Frame material
     const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x3e2723 });
 
-    // 🧩 Helper for frame segments
+    // Helper for frame segments
     const makeFramePart = (w, h, x, y) => {
       const geom = new THREE.BoxGeometry(w, h, this.frameDepth);
       const mesh = new THREE.Mesh(geom, frameMaterial);
@@ -49,7 +49,7 @@ export default class FramedImage {
     const leftFrame = makeFramePart(this.frameThickness, this.photoHeight, -halfW - this.frameThickness / 2, 0);
     const rightFrame = makeFramePart(this.frameThickness, this.photoHeight, halfW + this.frameThickness / 2, 0);
 
-    // 🧩 Combine all into one group
+    // Combine all into one group
     this.group.add(photoMesh, topFrame, bottomFrame, leftFrame, rightFrame);
 
     // Apply transforms
@@ -58,7 +58,7 @@ export default class FramedImage {
     this.group.scale.copy(scale);
     scene.add(this.group);
 
-    // 🧠 Create Cannon.js physics body
+    // Create Cannon.js physics body
     const shape = new CANNON.Box(
       new CANNON.Vec3(
         4.5,
@@ -81,7 +81,7 @@ export default class FramedImage {
     }
   }
 
-  // 🔁 Update Three.js group with Cannon.js physics
+  // Update Three.js group with Cannon.js physics
   update() {
     this.group.position.copy(this.body.position);
     this.group.quaternion.copy(this.body.quaternion);

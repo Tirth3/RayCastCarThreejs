@@ -57,7 +57,7 @@ export default class TriggerSphere {
       const intersects = this.raycaster.intersectObject(this.mesh);
       if (intersects.length > 0) {
         this.onClick = true;
-        console.log('✅ TriggerSphere clicked/touched!');
+        //console.log('✅ TriggerSphere clicked/touched!');
       }
     };
 
